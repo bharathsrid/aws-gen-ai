@@ -15,7 +15,43 @@ def read_csv_from_s3(bucket, key):
 def add_date_column(df):
     import pandas as pd
     df['date'] = pd.date_range('01-Jan2010', periods=len(df), freq='D')
+    # convert the date column to string
+    df['date'] = df['date'].astype(str)
     return df
+
+# a function to create a dynamo db table with name passed as parameter and update the passed dataframe as data with date column as the partition key
+
+def create_dynamo_table(table_name, df):
+    import boto3
+    import pandas as pd
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.create_table(
+        TableName=table_name,
+        KeySchema=[
+            {
+                'AttributeName': 'date',
+                'KeyType': 'HASH'  #Partition key
+            }
+        ],
+        AttributeDefinitions=[
+            {
+                'AttributeName': 'date',
+                'AttributeType': 'S'
+            }
+        ],
+        ProvisionedThroughput={
+            'ReadCapacityUnits': 10,
+            'WriteCapacityUnits': 10
+        }
+    )
+    table.wait_until_exists()
+    table.put_item(Item=df.iloc[0].to_dict())
+    return table
+
+
+
+
+
 
 # create function called main
 def main():
@@ -23,6 +59,8 @@ def main():
     df = read_csv_from_s3('bharsrid-demo-personal-genai', 'biostats.csv')
     # call the function add_date_column
     df = add_date_column(df)
+    # call the function create_dynamo_table
+    table = create_dynamo_table('bharsrid-demo-personal-genai-dynamo', df)
     print(df)
 
 
