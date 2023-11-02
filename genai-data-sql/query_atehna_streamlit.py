@@ -10,6 +10,8 @@ from sqlalchemy import create_engine
 from langchain.chat_models import BedrockChat
 from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
+from langchain.schema import HumanMessage
+import streamlit as st
 
 """
 Here we will build the required parameter to connect athena and query database.
@@ -35,7 +37,7 @@ Oracle SQL, and SQLite.
 """
 print(athena_connection_string)
 athena_engine = create_engine(athena_connection_string, echo=True)
-    athena_db_connection = SQLDatabase(athena_engine)
+athena_db_connection = SQLDatabase(athena_engine)
 
 def get_schema(_):
     return athena_db_connection.get_table_info()
@@ -96,6 +98,18 @@ SQL Response: {response}"""
     
     response = full_chain.invoke({"question": "How many employees are there?"})
     print(response)
+    
+    
+    user_input = st.text_area("Enter querry to Bedrock")
+    button = st.button("Ask Bedrock")
+    messages = [
+        HumanMessage(
+            content=f"{user_input}"
+        )
+    ]
+    if user_input and button:
+        summary = full_chain.invoke({messages})
+        st.write("Summary : ", summary)
 
 
 
