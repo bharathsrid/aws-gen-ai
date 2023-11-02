@@ -31,3 +31,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+# streamlit run basic_streamlit_app_bedrock.py 
