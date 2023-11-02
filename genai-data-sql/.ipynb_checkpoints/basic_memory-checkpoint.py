@@ -53,7 +53,7 @@ bedrock_llm = Bedrock(
 )
 
 
-# Get an OpenAI API Key before continuing
+# Get an OpenAI API Key before continuing   
 # if "openai_api_key" in st.secrets:
 #     openai_api_key = st.secrets.openai_api_key
 # else:
