@@ -13,13 +13,7 @@ from langchain.schema.runnable import RunnablePassthrough
 from langchain.schema import HumanMessage
 import streamlit as st
 
-"""
-Here we will build the required parameter to connect athena and query database.
-1. Data is stored in S3 and metadata in Glue metastore.
-2. Create a profille which will have access to the required service.
-3. if the database exists and s3 buckets exists use them else create.
 
-"""
 region = 'us-east-1'
 athena_url = f"athena.{region}.amazonaws.com" 
 athena_port = '443' #Update, if port is different
@@ -29,12 +23,6 @@ s3stagingathena = f's3://{glue_databucket_name}/athenaresults/'
 athena_wkgrp = 'primary' 
 athena_connection_string = f"awsathena+rest://@{athena_url}:{athena_port}/{athena_db}?s3_staging_dir={s3stagingathena}/&work_group={athena_wkgrp}"
 
-"""
-Under the hood, LangChain uses SQLAlchemy to connect to SQL databases. 
-The SQLDatabaseChain can therefore be used with any SQL dialect 
-supported by SQLAlchemy, such as MS SQL, MySQL, MariaDB, PostgreSQL, 
-Oracle SQL, and SQLite. 
-"""
 print(athena_connection_string)
 athena_engine = create_engine(athena_connection_string, echo=True)
 athena_db_connection = SQLDatabase(athena_engine)
@@ -94,21 +82,22 @@ SQL Response: {response}"""
     | prompt_response
     | chat
 )
-    full_chain.invoke({"question": "How many employees are there?"})
+#     full_chain.invoke({"question": "How many employees are there?"})
     
-    response = full_chain.invoke({"question": "How many employees are there?"})
-    print(response)
+#     response = full_chain.invoke({"question": "How many employees are there?"})
+#     print(response)
     
     
     user_input = st.text_area("Enter querry to Bedrock")
     button = st.button("Ask Bedrock")
-    messages = [
-        HumanMessage(
-            content=f"{user_input}"
-        )
-    ]
+    # messages = [
+    #     HumanMessage(
+    #         content=f"{user_input}"
+    #     )
+    # ]
     if user_input and button:
-        summary = full_chain.invoke({messages})
+        summary = full_chain.invoke({"question":user_input})
+        print(summary)
         st.write("Summary : ", summary)
 
 

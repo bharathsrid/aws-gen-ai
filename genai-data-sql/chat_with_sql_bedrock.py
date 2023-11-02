@@ -175,7 +175,7 @@ def main():
         )
     ]
     if user_input and button:
-        summary = full_chain.invoke(messages)
+        summary = full_chain.invoke({messages})
         st.write("Summary : ", summary)
 
 if __name__ == "__main__":
