@@ -21,14 +21,16 @@ def lambda_handler(event, context):
         stock_hist = stock_ticker.history(period="1y")
         stock_hist.reset_index(inplace=True)
         stock_hist["Symbol"] = symbol
-        stock_hist = stock_hist[['Symbol','Open','High','Low','Close','Volume']]
+        stock_hist = stock_hist[['Symbol','Date','Open','High','Low','Close','Volume']]
 
         # drop nulls
         stock_hist = dropna(stock_hist)
 
-        # initialize SMA
-        indicator_sma = SMAIndicator(stock_hist["Close"], window=20)
-        stock_hist["SMA"] = indicator_sma.sma_indicator()
+        # # initialize SMA
+        # indicator_sma = SMAIndicator(stock_hist["Close"], window=20)
+        # stock_hist["SMA"] = indicator_sma.sma_indicator()
+
+    
 
         #add the value of this stock to the data frame stock_hist_all
         stock_hist_all = pd.concat([stock_hist_all, stock_hist])
@@ -40,7 +42,9 @@ def lambda_handler(event, context):
 
 
     # WRITE THE DATAFRAME TO A CSV FILE IN s3
-    stock_hist_all.to_csv('/tmp/stock_data_1y.csv') 
+    # reset index
+    # stock_hist_all.reset_index(inplace=True)
+    stock_hist_all.to_csv('/tmp/stock_data_1y.csv',index=False) 
     bucket = 'bharsrid-bedrock-agent-yf-demo'
     key = 'stock_hist/stock_data_1y.csv'
     s3 = boto3.client('s3')
