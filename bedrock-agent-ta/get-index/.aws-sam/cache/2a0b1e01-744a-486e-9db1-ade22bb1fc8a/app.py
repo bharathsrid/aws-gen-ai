@@ -34,11 +34,42 @@ def lambda_handler(event, context):
     #     raise e
     
     print(event)
+    responses = []
     api_path = event['apiPath']
-    if api_path=="/get-index/brtIndex":
-        index_list = ['MSFT','AAPL','AMZN','NVDA','META','GOOG','NFLX','ADBE','QCOM','CSCO']
+    params = dict((param['name'], param['value']) for param in event['parameters'])
+    index_name = params['indexName'] 
+    print(index_name)
+    if api_path=="/get-index":
+        if index_name == 'brtIndex':
+            print("in brtIndex")
+            body = {"stocksList":['MSFT','AAPL','AMZN','NVDA','META','GOOG','NFLX','ADBE','QCOM','CSCO']}
+        else:
+            body = {"{} is not a valid Index, try another index ".format(event['inputText'])}
+
     else:
         body = {"{} is not a valid api, try another one.".format(api_path)}
+
+    response_body = {
+        'application/json': {
+            'body': json.dumps(body)
+        }
+    }
+
+    action_response = {
+        'actionGroup': event['actionGroup'],
+        'apiPath': event['apiPath'],
+        'httpMethod': event['httpMethod'],
+        'httpStatusCode': 200,
+        'responseBody': response_body
+    }
+
+    responses.append(action_response)
+
+    api_response = {
+        'messageVersion': '1.0',
+        'response': action_response}
+
+    return api_response
 
     return {
         "statusCode": 200,

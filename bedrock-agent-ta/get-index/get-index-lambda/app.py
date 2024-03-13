@@ -36,8 +36,12 @@ def lambda_handler(event, context):
     print(event)
     responses = []
     api_path = event['apiPath']
+    params = dict((param['name'], param['value']) for param in event['parameters'])
+    index_name = params['indexName'] 
+    print(index_name)
     if api_path=="/get-index":
-        if event['inputText'] == 'brtIndex'
+        if index_name == 'brtIndex':
+            print("in brtIndex")
             body = {"stocksList":['MSFT','AAPL','AMZN','NVDA','META','GOOG','NFLX','ADBE','QCOM','CSCO']}
         else:
             body = {"{} is not a valid Index, try another index ".format(event['inputText'])}

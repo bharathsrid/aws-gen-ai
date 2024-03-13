@@ -12,7 +12,7 @@
                     "description": "Based on provided index, return list of stock symbols in the index",
                     "operationId": "getIndex",
                     "parameters": [{
-                        "name": "IndexName",
+                        "name": "indexName",
                         "in": "path",
                         "description": "Index Name",
                         "required": true,
