@@ -1,12 +1,12 @@
 {
     "openapi": "3.0.0",
         "info": {
-            "title": "Get betIndex constituents api",
+            "title": "Get Index list of stocks api",
             "version": "1.0.0",
-            "description": "API to fetch the list of a given index"
+            "description": "API to fetch the list of stocks in a given index"
         },
         "paths": {
-            "/get-index/{indexName}": {
+            "/get-index": {
                 "get": {
                     "summary": "Get list of stock symbols in index",
                     "description": "Based on provided index, return list of stock symbols in the index",
@@ -46,7 +46,7 @@
                         }
                     }
                 }
-            },
+            }
             
             
         }    

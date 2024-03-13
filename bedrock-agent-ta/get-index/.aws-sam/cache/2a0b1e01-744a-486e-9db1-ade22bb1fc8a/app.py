@@ -32,11 +32,18 @@ def lambda_handler(event, context):
     #     print(e)
 
     #     raise e
+    
+    print(event)
+    api_path = event['apiPath']
+    if api_path=="/get-index/brtIndex":
+        index_list = ['MSFT','AAPL','AMZN','NVDA','META','GOOG','NFLX','ADBE','QCOM','CSCO']
+    else:
+        body = {"{} is not a valid api, try another one.".format(api_path)}
 
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "brtIndex": ['MSFT','AAPL','AMZN','NVDA','META','GOOG','NFLX','ADBE','QCOM','CSCO'],
+            "brtIndex": index_list,
             # "location": ip.text.replace("\n", "")
         }),
     }

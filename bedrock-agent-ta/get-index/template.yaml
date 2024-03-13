@@ -12,7 +12,7 @@ Globals:
     MemorySize: 128
 
 Resources:
-  HelloWorldFunction:
+  ApiFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: get-index-lambda/
@@ -21,14 +21,37 @@ Resources:
       Architectures:
         - x86_64
 
+  BedrockInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: !Ref ApiFunction
+      Action: lambda:InvokeFunction
+      Principal: bedrock.amazonaws.com
+      SourceArn: arn:aws:bedrock:us-east-1:743783005718:agent/*
+
+
+  # BedrockInvokePermission:
+  #   Type: AWS::Lambda::Permission 
+  #   Properties:
+  #     FunctionName: !Ref ApiFunction
+  #     Effect: Allow
+  #     Principal: 
+  #       Service: bedrock.amazonaws.com
+  #     Action: lambda:InvokeFunction
+  #     Resource : !GetAtt ApiFunction.Arn
+  #     Condition: 
+  #       ArnLike:
+  #         "aws:SourceArn": "arn:aws:bedrock:us-east-1:743783005718:agent/*"
+
+
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  ApiFunction:
+    Description: "Get Index Lambda Function ARN"
+    Value: !GetAtt ApiFunction.Arn
+  ApiFunctionIamRole:
+    Description: "Implicit IAM Role created for Api function"
+    Value: !GetAtt ApiFunctionRole.Arn

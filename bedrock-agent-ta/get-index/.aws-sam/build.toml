@@ -5,9 +5,9 @@ codeuri = "/local/home/bharsrid/bharath-public-gthub-repos/aws-gen-ai/bedrock-ag
 runtime = "python3.10"
 architecture = "x86_64"
 handler = "app.lambda_handler"
-source_hash = "2b7167345e91cf4a5fa7ab43b6ae3319e8dab0ea79c2d94037a179c1f5d96bbb"
+source_hash = "e55ccc1e7fb22d3b6a2a5c630370c008829bdd432c00516b5f393f6c2a122295"
 manifest_hash = ""
 packagetype = "Zip"
-functions = ["HelloWorldFunction"]
+functions = ["ApiFunction"]
 
 [layer_build_definitions]
