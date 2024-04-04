@@ -39,8 +39,15 @@ def lambda_handler(event, context):
     responses = []
     api_path = event['apiPath']
     params = dict((param['name'], param['value']) for param in event['parameters'])
-    stock_list = params['stockList']
-    no_of_days = params['noOfDays']
+
+
+    stock_list_input = params['stockList']
+    cleaned_stock_list_input_string = stock_list_input.replace('[','').replace(']','').replace('"','') 
+    stock_list = cleaned_stock_list_input_string.split(", ")
+    
+    print(stock_list)
+    print(type(stock_list))
+    no_of_days = int(params['noOfDays'])
 
     # download csv file from a s3 bucket into /tmp
     s3 = boto3.resource('s3')
@@ -56,6 +63,7 @@ def lambda_handler(event, context):
         print("in stock change")
 
         for stock in stock_list:
+            print(stock)
             stock_df = stock_1y_df[stock_1y_df['Symbol'] == stock]
             # filter stock df to retain only last 1 week data using the Date column as reference
             stock_1w_df = stock_df[stock_df['Date'] > stock_df['Date'].max() - pd.Timedelta(days=no_of_days)]
