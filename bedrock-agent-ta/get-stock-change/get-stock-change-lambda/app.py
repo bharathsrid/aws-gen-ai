@@ -40,6 +40,7 @@ def lambda_handler(event, context):
     api_path = event['apiPath']
     params = dict((param['name'], param['value']) for param in event['parameters'])
     stock_list = params['stockList']
+    no_of_days = params['noOfDays']
 
     # download csv file from a s3 bucket into /tmp
     s3 = boto3.resource('s3')
@@ -48,19 +49,35 @@ def lambda_handler(event, context):
     # convert the Date column in dataframe from string to datetime date
     stock_1y_df['Date'] = pd.to_datetime(stock_1y_df['Date'])
 
+    percent_change_dict = {}
+
 
     if api_path=="/get-stock-change":
         print("in stock change")
 
         for stock in stock_list:
             stock_df = stock_1y_df[stock_1y_df['Symbol'] == stock]
-        # filter stock df to retain only last 1 week data using the Date column as reference
-        stock_1w_df = stock_df[stock_df['Date'] > stock_df['Date'].max() - pd.Timedelta(days=7)]
-        stock_1w_df['Date'] = pd.to_datetime(stock_1w_df['Date'], infer_datetime_format=True)
-        print(stock_1w_df['Date'].dtype)
-        # reconvert datetime of Date column to string in dd-MMM-YYYY format
-        stock_1w_df['Date'] = stock_1w_df['Date'].dt.strftime('%d-%b-%Y')
-        body = stock_1w_df.to_json(orient='records')
+            # filter stock df to retain only last 1 week data using the Date column as reference
+            stock_1w_df = stock_df[stock_df['Date'] > stock_df['Date'].max() - pd.Timedelta(days=no_of_days)]
+            print(stock_1w_df.head(1))
+            print(stock_1w_df.tail(1))
+            first_close = stock_1w_df['Close'].iloc[0]
+            last_close = stock_1w_df['Close'].iloc[-1]
+            pct_change = ((last_close/first_close) - 1)*100
+            percent_change_dict[stock] = pct_change
+            
+        # convert the dictionary into json string
+        body = percent_change_dict
+
+
+
+
+
+        # stock_1w_df['Date'] = pd.to_datetime(stock_1w_df['Date'], infer_datetime_format=True)
+        # print(stock_1w_df['Date'].dtype)
+        # # reconvert datetime of Date column to string in dd-MMM-YYYY format
+        # stock_1w_df['Date'] = stock_1w_df['Date'].dt.strftime('%d-%b-%Y')
+        # body = stock_1w_df.to_json(orient='records')
 
     else:
         body = {"{} is not a valid api, try another one.".format(api_path)}
