@@ -3,13 +3,13 @@
         "info": {
             "title": "Get percentage change over the number of given days for the list of stocks",
             "version": "1.0.0",
-            "description": "API to fetch percentage change over a given number of days for the list of stocks"
+            "description": "API to fetch percentage change over a given number of days up to a maximum of 365 days for the list of stocks"
         },
         "paths": {
             "/get-stock-change": {
                 "get": {
                     "summary": "Get percentage change over a given number of days for the list of stocks",
-                    "description": "Get percentage change over a given number of days for the list of stocks",
+                    "description": "Get percentage change over a given number of days up to a maximum of 365 days for the list of stocks",
                     "operationId": "getPercentChange",
                     "parameters": [{
                         "name": "stockList",
