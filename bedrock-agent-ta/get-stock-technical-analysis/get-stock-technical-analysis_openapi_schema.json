@@ -8,13 +8,13 @@
         "paths": {
             "/get-stock-ta": {
                 "get": {
-                    "summary": "Get the last close and the value for ",
-                    "description": "Get percentage change over a given number of days up to a maximum of 365 days for the list of stocks",
-                    "operationId": "getPercentChange",
+                    "summary": "Get the last close and the value for a given technical indicator over a given number of days not more than 365 days for a list of stocks.",
+                    "description": "Get the last close and the value for a given technical indicator over a given number of days not more than 365 days for a  list of stocks",
+                    "operationId": "getStockTA",
                     "parameters": [{
                         "name": "stockList",
                         "in": "path",
-                        "description": "List of stock symbols to fetch the percentage change for",
+                        "description": "List of stock symbols to fetch the last close and the technical indicator over a given number of days",
                         "required": true,
                         "schema": {
                             "type": "array",
@@ -26,19 +26,30 @@
                     {
                         "name": "noOfDays",
                         "in": "path",
-                        "description": "Number of days over which  to fetch the percentage change needs to be fetched for",
+                        "description": "Number of days over which  to fetch the technical indicator for",
                         "required": true,
                         "schema": {
                             "type": "integer",
                             "maximum": 365,
                             "exclusiveMaximum": true
                             
-                        },
+                        }
+
+                    },
+                    {
+                        "name": "techIndicator",
+                        "in": "path",
+                        "description": "The technical indicator to fetch for each of the stock for the given number of days",
+                        "required": true,
+                        "schema": {
+                            "type": "String",
+                            "enum": ["SMA", "EMA"]
+                        }
 
                     }],
                     "responses": {
                         "200": {
-                            "description": "Get percentage change over a given number of days for the list of stocks",
+                            "description": "the last close and the value for a given technical indicator for the given number of days for the list of stocks",
                             "content": {
                                 "application/json": {
                                     "schema": {
@@ -52,11 +63,11 @@
                                                 },
                                                 "Close": {
                                                     "type": "float",
-                                                    "description": "This is the percentage change over the number of days for the given stock"
+                                                    "description": "This is the last close for the given stock"
                                                 },
                                                 "TI": {
                                                     "type": "float",
-                                                    "description": "This is the percentage change over the number of days for the given stock"
+                                                    "description": "This is the value of the requested technical indicator over the number of days for the stock"
                                                 }
                                             }
                                         }

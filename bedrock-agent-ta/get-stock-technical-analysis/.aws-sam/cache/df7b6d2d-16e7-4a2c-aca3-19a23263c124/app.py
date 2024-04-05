@@ -51,7 +51,7 @@ def lambda_handler(event, context):
     print(type(stock_list))
     print(len(stock_list))
     no_of_days = int(params['noOfDays'])
-    tech_analysis = params['techAnalysis']
+    tech_indicator = params['techIndicator']
 
     # download csv file from a s3 bucket into /tmp
     s3 = boto3.resource('s3')
@@ -72,32 +72,32 @@ def lambda_handler(event, context):
             print(stock)
             stock_df = stock_1y_df[stock_1y_df['Symbol'] == stock]
             # # initialize SMA
-            if tech_analysis == "SMA":
+            if tech_indicator == "SMA":
                 indicator_ta = SMAIndicator(stock_df["Close"], window=no_of_days)
-                stock_df["TA"] = indicator_ta.sma_indicator()
+                stock_df["TI"] = indicator_ta.sma_indicator()
                 print(stock_df.tail(5))
                 print(stock_df['Close'])
                 print(type(stock_df['Close']))
                 # assign the last row close to stock_close variable
                 stock_close = stock_df['Close'].iloc[-1]
-                stock_ta = stock_df['TA'].iloc[-1]
-                tmp_ta_dict["close"] = stock_close
-                tmp_ta_dict["ta"] = stock_ta
+                stock_ta = stock_df['TI'].iloc[-1]
+                tmp_ta_dict["Close"] = stock_close
+                tmp_ta_dict["TI"] = stock_ta
                 # add tmp_ta_dict to stock_ta_list
                 stock_ta_list.append(tmp_ta_dict)
-            elif tech_analysis == "EMA":
+            elif tech_indicator == "EMA":
                 indicator_ta = EMAIndicator(stock_df["Close"], window=no_of_days)
-                stock_df["TA"] = indicator_ta.ema_indicator()
+                stock_df["TI"] = indicator_ta.ema_indicator()
                 print(stock_df.tail(5))
                 print(stock_df['Close'])
                 print(type(stock_df['Close']))
                 stock_close = stock_df['Close'].iloc[-1]
-                stock_ta = stock_df['TA'].iloc[-1]
-                tmp_ta_dict["close"] = stock_close
-                tmp_ta_dict["ta"] = stock_ta
+                stock_ta = stock_df['TI'].iloc[-1]
+                tmp_ta_dict["Close"] = stock_close
+                tmp_ta_dict["TI"] = stock_ta
                 stock_ta_list.append(tmp_ta_dict)
             else:
-                body = {"{} is not a valid technical analysis, try another one.".format(tech_analysis)}  
+                body = {"{} is not a valid technical analysis, try another one.".format(tech_indicator)}  
 
 
         # convert the dictionary into json string
