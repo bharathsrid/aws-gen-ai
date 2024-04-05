@@ -1,0 +1,74 @@
+{
+    "openapi": "3.0.0",
+        "info": {
+            "title": "Get the last close and the value for a given technical indicator for the given number of days for a list of stocks",
+            "version": "1.0.0",
+            "description": "API to fetch the last close and the value for a given technical indicator for the given number of days up to a maximum of 365 days for the list of stocks"
+        },
+        "paths": {
+            "/get-stock-ta": {
+                "get": {
+                    "summary": "Get the last close and the value for ",
+                    "description": "Get percentage change over a given number of days up to a maximum of 365 days for the list of stocks",
+                    "operationId": "getPercentChange",
+                    "parameters": [{
+                        "name": "stockList",
+                        "in": "path",
+                        "description": "List of stock symbols to fetch the percentage change for",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "noOfDays",
+                        "in": "path",
+                        "description": "Number of days over which  to fetch the percentage change needs to be fetched for",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 365,
+                            "exclusiveMaximum": true
+                            
+                        },
+
+                    }],
+                    "responses": {
+                        "200": {
+                            "description": "Get percentage change over a given number of days for the list of stocks",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "stock": {
+                                                    "type": "String",
+                                                    "description": "This is the name of the stock"
+                                                },
+                                                "Close": {
+                                                    "type": "float",
+                                                    "description": "This is the percentage change over the number of days for the given stock"
+                                                },
+                                                "TI": {
+                                                    "type": "float",
+                                                    "description": "This is the percentage change over the number of days for the given stock"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            
+        }    
+    }
+    
