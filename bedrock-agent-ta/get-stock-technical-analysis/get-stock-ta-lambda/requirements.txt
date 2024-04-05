@@ -1,0 +1,3 @@
+requests
+ta
+urllib3<2
