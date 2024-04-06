@@ -44,11 +44,13 @@ def lambda_handler(event, context):
             print("in brtIndex")
             body = {"stocksList":['MSFT','AAPL','AMZN','NVDA','META','GOOG','NFLX','ADBE','QCOM','CSCO']}
         else:
-            body = {"{} is not a valid Index, try another index ".format(event['inputText'])}
+            body = list({"{} is not a valid Index the tool supports, try another index ".format(event['inputText'])})
 
     else:
-        body = {"{} is not a valid api, try another one.".format(api_path)}
+        body = list({"{} is not a valid api, try another one.".format(api_path)})
 
+    print(body)
+    print(type(body))
     response_body = {
         'application/json': {
             'body': json.dumps(body)

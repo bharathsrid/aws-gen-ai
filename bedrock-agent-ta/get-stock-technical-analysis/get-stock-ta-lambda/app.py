@@ -97,7 +97,7 @@ def lambda_handler(event, context):
                 tmp_ta_dict["TI"] = stock_ta
                 stock_ta_list.append(tmp_ta_dict)
             else:
-                body = {"{} is not a valid technical analysis, try another one.".format(tech_indicator)}  
+                body = list({"{} is not a valid technical analysis we support, try another one.".format(tech_indicator)})
 
 
         # convert the dictionary into json string
@@ -105,7 +105,7 @@ def lambda_handler(event, context):
 
 
     else:
-        body = {"{} is not a valid api, try another one.".format(api_path)}
+        body = list({"{} is not a valid api, try another one.".format(api_path)})
 
 
     response_body = {

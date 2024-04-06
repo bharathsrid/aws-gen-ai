@@ -88,7 +88,7 @@ def lambda_handler(event, context):
         # body = stock_1w_df.to_json(orient='records')
 
     else:
-        body = {"{} is not a valid api, try another one.".format(api_path)}
+        body = list({"{} is not a valid api, try another one.".format(api_path)})
 
 
     response_body = {
