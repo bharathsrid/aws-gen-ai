@@ -69,6 +69,8 @@ def sigv4_request(
     
 
 def askQuestion(question, url, endSession=False):
+    print("In ask question")
+    print(url)
     myobj = {
         "inputText": question,   
         "enableTrace": True,
@@ -88,6 +90,7 @@ def askQuestion(question, url, endSession=False):
         body=json.dumps(myobj)
     )
     
+    print(f"response is {response}")
     return decode_response(response)
 
 
