@@ -20,7 +20,7 @@ def crop_to_circle(image):
 st.title("Co. Portfolio Creator")
 
 # Display a text box for input
-prompt = st.text_input("Please enter your query?", max_chars=2000)
+prompt = st.text_input("Please enter your query?", max_chars=2000, label_visibility='collapsed')
 prompt = prompt.strip()
 
 # Display a primary button for submission
@@ -58,12 +58,13 @@ def format_response(response_body):
 
 # Handling user input and responses
 if submit_button and prompt:
+    print("BUTTON SUBMITTED")
     event = {
         "sessionId": "MYSESSION114",
         "question": prompt
     }
     response = agenthelper.lambda_handler(event, None)
-    
+    # print(f"app_Py response is {response}")
     try:
         # Parse the JSON string
         if response and 'body' in response and response['body']:
@@ -84,7 +85,7 @@ if submit_button and prompt:
         the_response = "Apologies, but an error occurred. Please rerun the application" 
 
     # Use trace_data and formatted_response as needed
-    st.sidebar.text_area("", value=all_data, height=300)
+    st.sidebar.text_area("", value=all_data, height=300, label_visibility='collapsed')
     st.session_state['history'].append({"question": prompt, "answer": the_response})
     st.session_state['trace_data'] = the_response
 
@@ -114,7 +115,7 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
         st.image(circular_human_image, width=125)
     with col2_q:
         # Generate a unique key for each question text area
-        st.text_area("Q:", value=chat["question"], height=50, key=f"question_{index}", disabled=True)
+        st.text_area("Q:", value=chat["question"], height=50, key=f"question_{index}", disabled=True, label_visibility='collapsed')
 
     # Creating columns for Answer
     col1_a, col2_a = st.columns([2, 10])
@@ -129,7 +130,7 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
             st.image(circular_robot_image, width=150)
         with col2_a:
             # Generate a unique key for each answer text area
-            st.text_area("A:", value=chat["answer"], height=100, key=f"answer_{index}")
+            st.text_area("A:", value=chat["answer"], height=100, key=f"answer_{index}", label_visibility='collapsed')
 
 # Example Prompts Section
 st.write("## Test Knowledge Base Prompts")

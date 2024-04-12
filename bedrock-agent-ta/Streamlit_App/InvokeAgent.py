@@ -8,6 +8,8 @@ from requests import request
 import base64
 import io
 import sys
+import time
+import boto3
 
 #For this to run on a local machine in VScode, you need to set the AWS_PROFILE environment variable to the name of the profile/credentials you want to use. 
 #You also need to input your model ID near the bottom of this file.
@@ -19,10 +21,10 @@ import sys
 
 
 #os.environ["AWS_PROFILE"] = "agent-demo"
-theRegion = "us-west-2"
+theRegion = "us-east-1"
 os.environ["AWS_REGION"] = theRegion
 region = os.environ.get("AWS_REGION")
-llm_response = ""
+llm_response = ""   
 
 def sigv4_request(
     url,
@@ -49,6 +51,7 @@ def sigv4_request(
     """
 
     # sign request
+    print("in sig4 call")
     req = AWSRequest(
         method=method,
         url=url,
@@ -56,6 +59,7 @@ def sigv4_request(
         params=params,
         headers=headers
     )
+
     SigV4Auth(credentials, service, region).add_auth(req)
     req = req.prepare()
 
@@ -90,71 +94,131 @@ def askQuestion(question, url, endSession=False):
         body=json.dumps(myobj)
     )
     
-    print(f"response is {response}")
+
+    decoded_response, llm_response = decode_response(response)
+
     return decode_response(response)
 
 
 def decode_response(response):
+    print("In decode response")
     # Create a StringIO object to capture print statements
     captured_output = io.StringIO()
+    print("about to set stdout")
     sys.stdout = captured_output
 
     # Your existing logic
-    string = ""
-    for line in response.iter_content():
-        try:
-            string += line.decode(encoding='utf-8')
-        except:
-            continue
+    try:
+        rationale_string = ""
 
-    print("Decoded response", string)
-    split_response = string.split(":message-type")
-    print(f"Split Response: {split_response}")
-    print(f"length of split: {len(split_response)}")
+        string = ""
+        for line in response.iter_content():
+            try:
+                string += line.decode(encoding='utf-8')
+            except:
+                continue
 
-    for idx in range(len(split_response)):
-        if "bytes" in split_response[idx]:
-            #print(f"Bytes found index {idx}")
-            encoded_last_response = split_response[idx].split("\"")[3]
+        print("Decoded response", string)
+        split_response = string.split(":message-type")
+
+        # print(f"type of json loads split response is {type(json.loads(split_response))}")
+        # print(f"Split Response: {split_response}")
+        print(f"length of split: {len(split_response)}")
+
+        i = 1
+        for ind_split in split_response:
+            if "rationale" in ind_split and "orchestrationTrace" in ind_split:
+                print(f"in orchestrationTrace rationale and i is {i}")
+                print(f"ind_split in rationale: {ind_split}")
+                print(f"type of ind split is {type(ind_split)}")
+                string_after_rationale = ind_split.split("rationale\":{")[1]
+                print("completed rationale split")
+                rationale = string_after_rationale.split("\"")[3]
+                print("complete colon split")
+                print(f"rationale: {rationale}")
+                rationale_string = rationale_string + f"Rationale {i} is :" + rationale + "\n"
+                i = i + 1
+
+            elif "rationale" in ind_split:
+                print(f"in rationale and i is {i}")
+                print(f"ind_split in rationale: {ind_split}")
+                string_after_rationale = ind_split.split("rationale\":\"")[1]
+                rationale = string_after_rationale.split("\"")[0]
+                print(f"rationale: {rationale}")
+                rationale_string = rationale_string + f"Rationale {i} is :" + rationale + "\n"
+                i = i + 1
+
+
+
+
+
+
+        for idx in range(len(split_response)):
+            if "bytes" in split_response[idx]:
+                #print(f"Bytes found index {idx}")
+                encoded_last_response = split_response[idx].split("\"")[3]
+                decoded = base64.b64decode(encoded_last_response)
+                final_response = decoded.decode('utf-8')
+                print(final_response)
+            else:
+                print(f"no bytes at index {idx}")
+                print(split_response[idx])
+                
+        last_response = split_response[-1]
+        print(f"Lst Response: {last_response}")
+        if "bytes" in last_response:
+            print("Bytes in last response")
+            encoded_last_response = last_response.split("\"")[3]
             decoded = base64.b64decode(encoded_last_response)
             final_response = decoded.decode('utf-8')
-            print(final_response)
         else:
-            print(f"no bytes at index {idx}")
-            print(split_response[idx])
-            
-    last_response = split_response[-1]
-    print(f"Lst Response: {last_response}")
-    if "bytes" in last_response:
-        print("Bytes in last response")
-        encoded_last_response = last_response.split("\"")[3]
-        decoded = base64.b64decode(encoded_last_response)
-        final_response = decoded.decode('utf-8')
-    else:
-        print("no bytes in last response")
-        part1 = string[string.find('finalResponse')+len('finalResponse":'):] 
-        part2 = part1[:part1.find('"}')+2]
-        final_response = json.loads(part2)['text']
+            print("no bytes in last response")
+            part1 = string[string.find('finalResponse')+len('finalResponse":'):] 
+            part2 = part1[:part1.find('"}')+2]
+            final_response = json.loads(part2)['text']
 
-    final_response = final_response.replace("\"", "")
-    final_response = final_response.replace("{input:{value:", "")
-    final_response = final_response.replace(",source:null}}", "")
-    llm_response = final_response
+        final_response = final_response.replace("\"", "")
+        final_response = final_response.replace("{input:{value:", "")
+        final_response = final_response.replace(",source:null}}", "")
+        llm_response = final_response
 
-    # Restore original stdout
-    sys.stdout = sys.__stdout__
+        # Restore original stdout
+        sys.stdout = sys.__stdout__
+        print("Restored stdout SUCCESS")
+        # Print the captured output 
+        # print(f'captured output is {captured_output.getvalue()}')
+        # Get the string from captured output
+        captured_string = captured_output.getvalue()
+        # print(f"captured response is {captured_string}")
+        # print(f"type of captured response is {type(captured_string)}")
+        
+        # print(captured_string)
+        print("ENDOF")
 
-    # Get the string from captured output
-    captured_string = captured_output.getvalue()
+        # print(f"type of captured response json loads is {type(json.loads(captured_string))}")
+    except Exception as e:
+        sys.stdout = sys.__stdout__
+        print("Restored stdout in Exception")
+        # Print the captured output
+        print(f'captured output is {captured_output.getvalue()}')
+        # Get the string from captured output
+        captured_string = captured_output.getvalue()
+        print(f"captured string is {captured_string}")
+        print(f"error is {e}")
+        print(f"EXCEPTION full rationale is {rationale}")
+        raise e
+
 
     # Return both the captured output and the final response
-    return captured_string, llm_response
+    print(f"full rationale is {rationale_string}")
+    # return captured_string, llm_response
+    return rationale_string, llm_response
 
 
 def lambda_handler(event, context):
     
     agentId = "8KCZPQNWJ6" #INPUT YOUR AGENT ID HERE
-    agentAliasId = "JJU9RYXX7A" # Hits draft alias, set to a specific alias id for a deployed version
+    agentAliasId = "TB7TCZJSPH" # Hits draft alias, set to a specific alias id for a deployed version
     sessionId = event["sessionId"]
     question = event["question"]
     endSession = False
@@ -172,6 +236,7 @@ def lambda_handler(event, context):
     
     try: 
         response, trace_data = askQuestion(question, url, endSession)
+        print("COMPLETED ASK QUESTION")
         return {
             "status_code": 200,
             "body": json.dumps({"response": response, "trace_data": trace_data})
