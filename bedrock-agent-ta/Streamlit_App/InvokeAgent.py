@@ -171,18 +171,15 @@ def decode_response(response):
         # print(f"Split Response: {split_response}")
         print(f"length of split: {len(split_response)}")
 
-        
+        # get rationale from orchestration trace
         for ind_split in split_response:
             if "rationale" in ind_split and "orchestrationTrace" in ind_split:
                 # print(f"in orchestrationTrace rationale and i is {i}")
-                print(f"ind_split in rationale: {ind_split}")
-                print(f"type of ind split is {type(ind_split)}")
                 string_after_rationale = ind_split.split("rationale\":{")[1]
-                print("completed rationale split")
                 rationale = string_after_rationale.split("\"")[3]
-                print("complete colon split")
                 print(f"rationale: {rationale}")
-                rationale_string = rationale_string + f"Orchestration rationale is :" + rationale + "\n"
+                if len(rationale.strip()) > 0:
+                    rationale_string = rationale_string + f"Orchestration rationale is :" + rationale + "\n"
                 
             elif "rationale" in ind_split:
                 # print(f"in rationale and i is {i}")
@@ -190,7 +187,8 @@ def decode_response(response):
                 string_after_rationale = ind_split.split("rationale\":\"")[1]
                 rationale = string_after_rationale.split("\"")[0]
                 print(f"rationale: {rationale}")
-                rationale_string = rationale_string + f"Rationale  is :" + rationale + "\n"
+                if len(rationale.strip()) > 0:
+                    rationale_string = rationale_string + f"Rationale  is :" + rationale + "\n"
                 
 
 
@@ -290,3 +288,4 @@ def lambda_handler(event, context):
             "status_code": 500,
             "body": json.dumps({"error": str(e)})
         }
+
