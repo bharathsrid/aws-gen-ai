@@ -3,6 +3,9 @@ import streamlit as st
 import json
 import pandas as pd
 from PIL import Image, ImageOps, ImageDraw
+import random
+
+sessionId = "MYSESSION" + str(random.randint(1, 100000))
 
 # Streamlit page configuration
 st.set_page_config(page_title="Co. Portfolio Creator", page_icon=":robot_face:", layout="wide")
@@ -20,7 +23,7 @@ def crop_to_circle(image):
 st.title("Co. Portfolio Creator")
 
 # Display a text box for input
-prompt = st.text_input("Please enter your query?", max_chars=2000, label_visibility='collapsed')
+prompt = st.text_input("Please enter your query?", max_chars=2000)
 prompt = prompt.strip()
 
 # Display a primary button for submission
@@ -58,13 +61,12 @@ def format_response(response_body):
 
 # Handling user input and responses
 if submit_button and prompt:
-    print("BUTTON SUBMITTED")
     event = {
-        "sessionId": "MYSESSION114",
+        "sessionId": sessionId,
         "question": prompt
     }
     response = agenthelper.lambda_handler(event, None)
-    # print(f"app_Py response is {response}")
+    
     try:
         # Parse the JSON string
         if response and 'body' in response and response['body']:
@@ -85,17 +87,18 @@ if submit_button and prompt:
         the_response = "Apologies, but an error occurred. Please rerun the application" 
 
     # Use trace_data and formatted_response as needed
-    st.sidebar.text_area("", value=all_data, height=300, label_visibility='collapsed')
+    st.sidebar.text_area("", value=all_data, height=300)
     st.session_state['history'].append({"question": prompt, "answer": the_response})
     st.session_state['trace_data'] = the_response
 
 if end_session_button:
     st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!"})
     event = {
-        "sessionId": "MYSESSION114",
+        "sessionId": sessionId,
         "question": "placeholder to end session",
         "endSession": True
     }
+    globals()['sessionId'] = "MYSESSION" + str(random.randint(1, 100000))
     agenthelper.lambda_handler(event, None)
     st.session_state['history'].clear()
 
@@ -115,7 +118,7 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
         st.image(circular_human_image, width=125)
     with col2_q:
         # Generate a unique key for each question text area
-        st.text_area("Q:", value=chat["question"], height=50, key=f"question_{index}", disabled=True, label_visibility='collapsed')
+        st.text_area("Q:", value=chat["question"], height=50, key=f"question_{index}", disabled=True)
 
     # Creating columns for Answer
     col1_a, col2_a = st.columns([2, 10])
@@ -130,7 +133,7 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
             st.image(circular_robot_image, width=150)
         with col2_a:
             # Generate a unique key for each answer text area
-            st.text_area("A:", value=chat["answer"], height=100, key=f"answer_{index}", label_visibility='collapsed')
+            st.text_area("A:", value=chat["answer"], height=100, key=f"answer_{index}")
 
 # Example Prompts Section
 st.write("## Test Knowledge Base Prompts")

@@ -8,8 +8,6 @@ from requests import request
 import base64
 import io
 import sys
-import time
-import boto3
 
 #For this to run on a local machine in VScode, you need to set the AWS_PROFILE environment variable to the name of the profile/credentials you want to use. 
 #You also need to input your model ID near the bottom of this file.
@@ -24,7 +22,7 @@ import boto3
 theRegion = "us-east-1"
 os.environ["AWS_REGION"] = theRegion
 region = os.environ.get("AWS_REGION")
-llm_response = ""   
+llm_response = ""
 
 def sigv4_request(
     url,
@@ -51,7 +49,6 @@ def sigv4_request(
     """
 
     # sign request
-    print("in sig4 call")
     req = AWSRequest(
         method=method,
         url=url,
@@ -59,7 +56,6 @@ def sigv4_request(
         params=params,
         headers=headers
     )
-
     SigV4Auth(credentials, service, region).add_auth(req)
     req = req.prepare()
 
@@ -73,8 +69,6 @@ def sigv4_request(
     
 
 def askQuestion(question, url, endSession=False):
-    print("In ask question")
-    print(url)
     myobj = {
         "inputText": question,   
         "enableTrace": True,
@@ -94,12 +88,64 @@ def askQuestion(question, url, endSession=False):
         body=json.dumps(myobj)
     )
     
-
-    decoded_response, llm_response = decode_response(response)
-
     return decode_response(response)
 
 
+# def decode_response(response):
+#     # Create a StringIO object to capture print statements
+#     captured_output = io.StringIO()
+#     sys.stdout = captured_output
+
+#     # Your existing logic
+#     string = ""
+#     for line in response.iter_content():
+#         try:
+#             string += line.decode(encoding='utf-8')
+#         except:
+#             continue
+
+#     print("Decoded response", string)
+#     split_response = string.split(":message-type")
+#     print(f"Split Response: {split_response}")
+#     print(f"length of split: {len(split_response)}")
+
+#     for idx in range(len(split_response)):
+#         if "bytes" in split_response[idx]:
+#             #print(f"Bytes found index {idx}")
+#             encoded_last_response = split_response[idx].split("\"")[3]
+#             decoded = base64.b64decode(encoded_last_response)
+#             final_response = decoded.decode('utf-8')
+#             print(final_response)
+#         else:
+#             print(f"no bytes at index {idx}")
+#             print(split_response[idx])
+            
+#     last_response = split_response[-1]
+#     print(f"Lst Response: {last_response}")
+#     if "bytes" in last_response:
+#         print("Bytes in last response")
+#         encoded_last_response = last_response.split("\"")[3]
+#         decoded = base64.b64decode(encoded_last_response)
+#         final_response = decoded.decode('utf-8')
+#     else:
+#         print("no bytes in last response")
+#         part1 = string[string.find('finalResponse')+len('finalResponse":'):] 
+#         part2 = part1[:part1.find('"}')+2]
+#         final_response = json.loads(part2)['text']
+
+#     final_response = final_response.replace("\"", "")
+#     final_response = final_response.replace("{input:{value:", "")
+#     final_response = final_response.replace(",source:null}}", "")
+#     llm_response = final_response
+
+#     # Restore original stdout
+#     sys.stdout = sys.__stdout__
+
+#     # Get the string from captured output
+#     captured_string = captured_output.getvalue()
+
+#     # Return both the captured output and the final response
+#     return captured_string, llm_response
 def decode_response(response):
     print("In decode response")
     # Create a StringIO object to capture print statements
@@ -125,10 +171,10 @@ def decode_response(response):
         # print(f"Split Response: {split_response}")
         print(f"length of split: {len(split_response)}")
 
-        i = 1
+        
         for ind_split in split_response:
             if "rationale" in ind_split and "orchestrationTrace" in ind_split:
-                print(f"in orchestrationTrace rationale and i is {i}")
+                # print(f"in orchestrationTrace rationale and i is {i}")
                 print(f"ind_split in rationale: {ind_split}")
                 print(f"type of ind split is {type(ind_split)}")
                 string_after_rationale = ind_split.split("rationale\":{")[1]
@@ -136,21 +182,16 @@ def decode_response(response):
                 rationale = string_after_rationale.split("\"")[3]
                 print("complete colon split")
                 print(f"rationale: {rationale}")
-                rationale_string = rationale_string + f"Rationale {i} is :" + rationale + "\n"
-                i = i + 1
-
+                rationale_string = rationale_string + f"Orchestration rationale is :" + rationale + "\n"
+                
             elif "rationale" in ind_split:
-                print(f"in rationale and i is {i}")
+                # print(f"in rationale and i is {i}")
                 print(f"ind_split in rationale: {ind_split}")
                 string_after_rationale = ind_split.split("rationale\":\"")[1]
                 rationale = string_after_rationale.split("\"")[0]
                 print(f"rationale: {rationale}")
-                rationale_string = rationale_string + f"Rationale {i} is :" + rationale + "\n"
-                i = i + 1
-
-
-
-
+                rationale_string = rationale_string + f"Rationale  is :" + rationale + "\n"
+                
 
 
         for idx in range(len(split_response)):
@@ -212,7 +253,11 @@ def decode_response(response):
     # Return both the captured output and the final response
     print(f"full rationale is {rationale_string}")
     # return captured_string, llm_response
+    print("START OF FULL TRACE============")
+    print(captured_string)
+    print("END OF FULL TRACE============")
     return rationale_string, llm_response
+
 
 
 def lambda_handler(event, context):
@@ -236,7 +281,6 @@ def lambda_handler(event, context):
     
     try: 
         response, trace_data = askQuestion(question, url, endSession)
-        print("COMPLETED ASK QUESTION")
         return {
             "status_code": 200,
             "body": json.dumps({"response": response, "trace_data": trace_data})
@@ -246,5 +290,3 @@ def lambda_handler(event, context):
             "status_code": 500,
             "body": json.dumps({"error": str(e)})
         }
-
-
