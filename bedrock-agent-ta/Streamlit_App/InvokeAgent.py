@@ -1,28 +1,4 @@
-from boto3.session import Session
-from botocore.auth import SigV4Auth
-from botocore.awsrequest import AWSRequest
-from botocore.credentials import Credentials
-import json
-import os
-from requests import request
-import base64
-import io
-import sys
-
-#For this to run on a local machine in VScode, you need to set the AWS_PROFILE environment variable to the name of the profile/credentials you want to use.
-#You also need to input your model ID near the bottom of this file.
-
-#check for credentials
-#echo $AWS_ACCESS_KEY_ID
-#echo $AWS_SECRET_ACCESS_KEY
-#echo $AWS_SESSION_TOKEN
-
-
-#os.environ["AWS_PROFILE"] = "agent-demo"
-theRegion = "us-east-1"
-os.environ["AWS_REGION"] = theRegion
-region = os.environ.get("AWS_REGION")
-llm_response = ""
+from boto3.session import Sessionfrom botocore.auth import SigV4Authfrom botocore.awsrequest import AWSRequestfrom botocore.credentials import Credentialsimport jsonimport osfrom requests import requestimport base64import ioimport sys#For this to run on a local machine in VScode, you need to set the AWS_PROFILE environment variable to the name of the profile/credentials you want to use.#You also need to input your model ID near the bottom of this file.#check for credentials#echo $AWS_ACCESS_KEY_ID#echo $AWS_SECRET_ACCESS_KEY#echo $AWS_SESSION_TOKEN#os.environ["AWS_PROFILE"] = "agent-demo"theRegion = "us-east-1"os.environ["AWS_REGION"] = theRegionregion = os.environ.get("AWS_REGION")llm_response = ""
 
 def sigv4_request(
     url,
