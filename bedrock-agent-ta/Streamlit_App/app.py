@@ -5,6 +5,7 @@ import pandas as pd
 from PIL import Image, ImageOps, ImageDraw
 import random
 
+
 # sessionId = "MYSESSION" + str(random.randint(1, 100000))
 
 # Streamlit page configuration
@@ -37,7 +38,7 @@ submit_button = st.button("Submit", type="primary")
 end_session_button = st.button("End Session")
 
 # Sidebar for user input
-st.sidebar.title("Trace Data")
+st.sidebar.title("Rationale")
 
 def filter_trace_data(trace_data, query):
     if query:
@@ -84,6 +85,8 @@ if submit_button and prompt:
         print("JSON decoding error:", e)
         response_data = None
 
+    rationale=""
+    the_text=""
     try:
         # Extract the response and trace data
         llm_response = format_response(response_data['response'])
@@ -95,6 +98,9 @@ if submit_button and prompt:
 
     # Use trace_data and formatted_response as needed
     st.sidebar.text_area("", value=rationale, height=300)
+    st.sidebar.title("Full Text")
+    st.sidebar.text_area("", value=the_text, height=600) 
+
     st.session_state['history'].append({"question": prompt, "answer": llm_response})
     st.session_state['trace_data'] = rationale
 
@@ -143,40 +149,15 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
             st.text_area("A:", value=chat["answer"], height=100, key=f"answer_{index}")
 
 # Example Prompts Section
-st.write("## Test Knowledge Base Prompts")
+st.write("## Test Prompts")
 
 # Creating a list of prompts for the Knowledge Base section
-knowledge_base_prompts = [
-    {"Prompt": "Give me a summary of financial market developments and open market operations in January 2023"},
-    {"Prompt": "Tell me the participants view on economic conditions and economic outlook"},
-    {"Prompt": "Provide any important information I should know about consumer inflation, or rising prices"},
-    {"Prompt": "Tell me about the Staff Review of the Economic & financial Situation"}
+test_prompts = [
+    {"Prompt": "can you give me list of stocks in brtIndex"},
+    {"Prompt": "can you give me list of stocks in brtIndex starting with A"},
+    {"Prompt": "Of these which has grown the most in terms of percentage in the last 6 months"},
+    {"Prompt": "Which stocks have closed over both 20 SMA and 50 EMA"}
 ]
 
 # Displaying the Knowledge Base prompts as a table
-st.table(knowledge_base_prompts)
-
-# Test Action Group Prompts
-st.write("## Test Action Group Prompts")
-
-# Creating a list of prompts for the Action Group section
-action_group_prompts = [
-    {"Prompt": "Create a portfolio with 3 companies in the real estate industry"},
-    {"Prompt": "Create a portfolio of 4 companies that are in the technology industry"},
-    {"Prompt": "Create a new investment portfolio of companies"},
-    {"Prompt": "Do company research on TechStashNova Inc."}
-]
-
-# Displaying the Action Group prompts as a table
-st.table(action_group_prompts)
-
-st.write("## Test KB, AG, History Prompt")
-
-# Creating a list of prompts for the specific task
-task_prompts = [
-    {"Task": "Send an email to test@example.com that includes the company portfolio and summary report",
-     "Note": "The logic for this method is not implemented to send emails"}
-]
-
-# Displaying the task prompt as a table
-st.table(task_prompts)
+st.table(test_prompts)
