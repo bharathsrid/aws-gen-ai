@@ -9,7 +9,7 @@ import base64
 import io
 import sys
 
-#For this to run on a local machine in VScode, you need to set the AWS_PROFILE environment variable to the name of the profile/credentials you want to use. 
+#For this to run on a local machine in VScode, you need to set the AWS_PROFILE environment variable to the name of the profile/credentials you want to use.
 #You also need to input your model ID near the bottom of this file.
 
 #check for credentials
@@ -66,28 +66,28 @@ def sigv4_request(
         headers=req.headers,
         data=req.body
     )
-    
+
 
 def askQuestion(question, url, endSession=False):
     myobj = {
-        "inputText": question,   
+        "inputText": question,
         "enableTrace": True,
         "endSession": endSession
     }
-    
+
     # send request
     response = sigv4_request(
         url,
         method='POST',
         service='bedrock',
         headers={
-            'content-type': 'application/json', 
+            'content-type': 'application/json',
             'accept': 'application/json',
         },
         region=theRegion,
         body=json.dumps(myobj)
     )
-    
+
     return decode_response(response)
 
 
@@ -119,7 +119,7 @@ def askQuestion(question, url, endSession=False):
 #         else:
 #             print(f"no bytes at index {idx}")
 #             print(split_response[idx])
-            
+
 #     last_response = split_response[-1]
 #     print(f"Lst Response: {last_response}")
 #     if "bytes" in last_response:
@@ -129,7 +129,7 @@ def askQuestion(question, url, endSession=False):
 #         final_response = decoded.decode('utf-8')
 #     else:
 #         print("no bytes in last response")
-#         part1 = string[string.find('finalResponse')+len('finalResponse":'):] 
+#         part1 = string[string.find('finalResponse')+len('finalResponse":'):]
 #         part2 = part1[:part1.find('"}')+2]
 #         final_response = json.loads(part2)['text']
 
@@ -146,6 +146,25 @@ def askQuestion(question, url, endSession=False):
 
 #     # Return both the captured output and the final response
 #     return captured_string, llm_response
+
+
+def find_rationale_text(split_response_dict, all_rationale, all_text):
+    try:
+        for key, value in split_response_dict.items():
+            if key == "rationale":
+                if isinstance(value, dict):
+                    all_rationale = all_rationale + value['text'] + "\n"
+                else:
+                    all_rationale = all_rationale + value + "\n"
+            elif key == "text":
+                all_text = all_text + value + "\n"
+            elif isinstance(value, dict):
+                all_rationale, all_text = find_rationale_text(value, all_rationale, all_text)
+    except Exception as e:
+        print(e)
+    return all_rationale, all_text
+
+
 def decode_response(response):
     print("In decode response")
     # Create a StringIO object to capture print statements
@@ -166,30 +185,46 @@ def decode_response(response):
 
         print("Decoded response", string)
         split_response = string.split(":message-type")
+        all_text = ""
+        all_rationale = ""
+        for ind_split_response in split_response:
+            if "event{" in ind_split_response:
+                after_open_braces = ind_split_response.split("event{")[1]
+                close_split = after_open_braces.split("}")
+                json_string = ''
+                for i in range(0, len(close_split)-1):
+                    json_string = json_string + close_split[i] + "}"
+                json_string = "{" + json_string
+                split_response_dict = json.loads(json_string)
+                all_rationale, all_text = find_rationale_text(split_response_dict, all_rationale, all_text)
+                print("")
+                print(split_response_dict)
+                print("")
+
 
         # print(f"type of json loads split response is {type(json.loads(split_response))}")
         # print(f"Split Response: {split_response}")
         print(f"length of split: {len(split_response)}")
 
-        # get rationale from orchestration trace
-        for ind_split in split_response:
-            if "rationale" in ind_split and "orchestrationTrace" in ind_split:
-                # print(f"in orchestrationTrace rationale and i is {i}")
-                string_after_rationale = ind_split.split("rationale\":{")[1]
-                rationale = string_after_rationale.split("\"")[3]
-                print(f"rationale: {rationale}")
-                if len(rationale.strip()) > 0:
-                    rationale_string = rationale_string + f"Orchestration rationale is :" + rationale + "\n"
-                
-            elif "rationale" in ind_split:
-                # print(f"in rationale and i is {i}")
-                print(f"ind_split in rationale: {ind_split}")
-                string_after_rationale = ind_split.split("rationale\":\"")[1]
-                rationale = string_after_rationale.split("\"")[0]
-                print(f"rationale: {rationale}")
-                if len(rationale.strip()) > 0:
-                    rationale_string = rationale_string + f"Rationale  is :" + rationale + "\n"
-                
+        # # get rationale from orchestration trace
+        # for ind_split in split_response:
+        #     if "rationale" in ind_split and "orchestrationTrace" in ind_split:
+        #         # print(f"in orchestrationTrace rationale and i is {i}")
+        #         string_after_rationale = ind_split.split("rationale\":{")[1]
+        #         rationale = string_after_rationale.split("\"")[3]
+        #         print(f"rationale: {rationale}")
+        #         if len(rationale.strip()) > 0:
+        #             rationale_string = rationale_string + f"Orchestration rationale is :" + rationale + "\n"
+
+        #     elif "rationale" in ind_split:
+        #         # print(f"in rationale and i is {i}")
+        #         print(f"ind_split in rationale: {ind_split}")
+        #         string_after_rationale = ind_split.split("rationale\":\"")[1]
+        #         rationale = string_after_rationale.split("\"")[0]
+        #         print(f"rationale: {rationale}")
+        #         if len(rationale.strip()) > 0:
+        #             rationale_string = rationale_string + f"Rationale  is :" + rationale + "\n"
+
 
 
         for idx in range(len(split_response)):
@@ -202,7 +237,7 @@ def decode_response(response):
             else:
                 print(f"no bytes at index {idx}")
                 print(split_response[idx])
-                
+
         last_response = split_response[-1]
         print(f"Lst Response: {last_response}")
         if "bytes" in last_response:
@@ -212,7 +247,7 @@ def decode_response(response):
             final_response = decoded.decode('utf-8')
         else:
             print("no bytes in last response")
-            part1 = string[string.find('finalResponse')+len('finalResponse":'):] 
+            part1 = string[string.find('finalResponse')+len('finalResponse":'):]
             part2 = part1[:part1.find('"}')+2]
             final_response = json.loads(part2)['text']
 
@@ -224,13 +259,13 @@ def decode_response(response):
         # Restore original stdout
         sys.stdout = sys.__stdout__
         print("Restored stdout SUCCESS")
-        # Print the captured output 
+        # Print the captured output
         # print(f'captured output is {captured_output.getvalue()}')
         # Get the string from captured output
         captured_string = captured_output.getvalue()
         # print(f"captured response is {captured_string}")
         # print(f"type of captured response is {type(captured_string)}")
-        
+
         # print(captured_string)
         print("ENDOF")
 
@@ -254,38 +289,38 @@ def decode_response(response):
     print("START OF FULL TRACE============")
     print(captured_string)
     print("END OF FULL TRACE============")
-    return rationale_string, llm_response
+    return all_rationale, all_text, llm_response
 
 
 
 def lambda_handler(event, context):
-    
+
     agentId = "8KCZPQNWJ6" #INPUT YOUR AGENT ID HERE
     agentAliasId = "TB7TCZJSPH" # Hits draft alias, set to a specific alias id for a deployed version
     sessionId = event["sessionId"]
     question = event["question"]
     endSession = False
-    
+
     print(f"Session: {sessionId} asked question: {question}")
-    
+
     try:
         if (event["endSession"] == "true"):
             endSession = True
     except:
         endSession = False
-    
+
     url = f'https://bedrock-agent-runtime.{theRegion}.amazonaws.com/agents/{agentId}/agentAliases/{agentAliasId}/sessions/{sessionId}/text'
 
-    
-    try: 
-        response, trace_data = askQuestion(question, url, endSession)
+
+    try:
+        # response, trace_data = askQuestion(question, url, endSession)
+        all_rationale, all_text, llm_response = askQuestion(question, url, endSession)
         return {
             "status_code": 200,
-            "body": json.dumps({"response": response, "trace_data": trace_data})
+            "body": json.dumps({"response": llm_response, "rationale": all_rationale, "text": all_text})
         }
     except Exception as e:
         return {
             "status_code": 500,
             "body": json.dumps({"error": str(e)})
         }
-
