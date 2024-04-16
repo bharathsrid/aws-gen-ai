@@ -154,8 +154,8 @@ st.write("## Test Prompts")
 # Creating a list of prompts for the Knowledge Base section
 test_prompts = [
     {"Prompt": "can you give me list of stocks in brtIndex"},
-    {"Prompt": "can you give me list of stocks in brtIndex starting with A"},
-    {"Prompt": "Of these which has grown the most in terms of percentage in the last 6 months"},
+    {"Prompt": "can you give the top three gainers in terms of percentage in the last 6 months in brtIndex"},
+    {"Prompt": "CAn you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA"},
     {"Prompt": "Which stocks have closed over both 20 SMA and 50 EMA"}
 ]
 
