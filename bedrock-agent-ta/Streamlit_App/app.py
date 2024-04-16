@@ -9,7 +9,7 @@ import random
 # sessionId = "MYSESSION" + str(random.randint(1, 100000))
 
 # Streamlit page configuration
-st.set_page_config(page_title="Co. Portfolio Creator", page_icon=":robot_face:", layout="wide")
+st.set_page_config(page_title="Stock Technical Anlysis Bot", page_icon=":robot_face:", layout="wide")
 
 # Function to crop image into a circle
 def crop_to_circle(image):
@@ -21,11 +21,9 @@ def crop_to_circle(image):
     return result
 
 # Title
-if 'sessionId' not in st.session_state:
-    st.title("Co. Portfolio Creator")
-else:
-    sessionId = st.session_state['sessionId']
-    st.title("Co. Portfolio Creator Session id " + sessionId)
+st.title("Stock Technical Anlysis Bot")
+
+
 
 # Display a text box for input
 prompt = st.text_input("Please enter your query?", max_chars=2000)
