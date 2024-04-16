@@ -5,7 +5,7 @@ import pandas as pd
 from PIL import Image, ImageOps, ImageDraw
 import random
 
-sessionId = "MYSESSION" + str(random.randint(1, 100000))
+# sessionId = "MYSESSION" + str(random.randint(1, 100000))
 
 # Streamlit page configuration
 st.set_page_config(page_title="Co. Portfolio Creator", page_icon=":robot_face:", layout="wide")
@@ -20,7 +20,11 @@ def crop_to_circle(image):
     return result
 
 # Title
-st.title("Co. Portfolio Creator")
+if 'sessionId' not in st.session_state:
+    st.title("Co. Portfolio Creator")
+else:
+    sessionId = st.session_state['sessionId']
+    st.title("Co. Portfolio Creator Session id " + sessionId)
 
 # Display a text box for input
 prompt = st.text_input("Please enter your query?", max_chars=2000)
@@ -61,12 +65,14 @@ def format_response(response_body):
 
 # Handling user input and responses
 if submit_button and prompt:
+    if 'sessionId' not in st.session_state:
+        st.session_state['sessionId'] = "MYSESSION" + str(random.randint(1, 100000))
     event = {
-        "sessionId": sessionId,
+        "sessionId": st.session_state['sessionId'],
         "question": prompt
     }
     response = agenthelper.lambda_handler(event, None)
-    
+
     try:
         # Parse the JSON string
         if response and 'body' in response and response['body']:
@@ -76,20 +82,21 @@ if submit_button and prompt:
             print("Invalid or empty response received")
     except json.JSONDecodeError as e:
         print("JSON decoding error:", e)
-        response_data = None 
-    
+        response_data = None
+
     try:
         # Extract the response and trace data
-        all_data = format_response(response_data['response'])
-        the_response = response_data['trace_data']
+        llm_response = format_response(response_data['response'])
+        rationale = response_data['rationale']
+        the_text = response_data['text']
     except:
-        all_data = "..." 
-        the_response = "Apologies, but an error occurred. Please rerun the application" 
+        all_data = "..."
+        llm_response = "Apologies, but an error occurred. Please rerun the application"
 
     # Use trace_data and formatted_response as needed
-    st.sidebar.text_area("", value=all_data, height=300)
-    st.session_state['history'].append({"question": prompt, "answer": the_response})
-    st.session_state['trace_data'] = the_response
+    st.sidebar.text_area("", value=rationale, height=300)
+    st.session_state['history'].append({"question": prompt, "answer": llm_response})
+    st.session_state['trace_data'] = rationale
 
 if end_session_button:
     st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!"})
@@ -167,7 +174,7 @@ st.write("## Test KB, AG, History Prompt")
 
 # Creating a list of prompts for the specific task
 task_prompts = [
-    {"Task": "Send an email to test@example.com that includes the company portfolio and summary report", 
+    {"Task": "Send an email to test@example.com that includes the company portfolio and summary report",
      "Note": "The logic for this method is not implemented to send emails"}
 ]
 
