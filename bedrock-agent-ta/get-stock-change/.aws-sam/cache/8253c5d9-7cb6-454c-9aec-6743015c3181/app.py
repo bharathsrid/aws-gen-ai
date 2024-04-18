@@ -67,12 +67,16 @@ def lambda_handler(event, context):
             stock_df = stock_1y_df[stock_1y_df['Symbol'] == stock]
             # filter stock df to retain only last 1 week data using the Date column as reference
             stock_1w_df = stock_df[stock_df['Date'] > stock_df['Date'].max() - pd.Timedelta(days=no_of_days)]
-            print(stock_1w_df.head(1))
-            print(stock_1w_df.tail(1))
-            first_close = stock_1w_df['Close'].iloc[0]
-            last_close = stock_1w_df['Close'].iloc[-1]
-            pct_change = ((last_close/first_close) - 1)*100
-            percent_change_dict[stock] = pct_change
+            try:
+                print(stock_1w_df.head(1))
+                print(stock_1w_df.tail(1))
+                first_close = stock_1w_df['Close'].iloc[0]
+                last_close = stock_1w_df['Close'].iloc[-1]
+                pct_change = ((last_close/first_close) - 1)*100
+                percent_change_dict[stock] = pct_change
+            except Exception as e:
+                print(f"errored getting percentage with error {e}")
+                percent_change_dict[stock] = "NA"
             
         # convert the dictionary into json string
         body = percent_change_dict

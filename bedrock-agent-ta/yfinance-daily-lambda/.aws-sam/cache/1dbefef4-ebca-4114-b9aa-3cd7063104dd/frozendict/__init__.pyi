@@ -10,9 +10,9 @@ except ImportError:
     Type = type
 
 K = TypeVar("K")
-V = TypeVar("V")
+V = TypeVar("V", covariant=True)
 K2 = TypeVar("K2")
-V2 = TypeVar("V2")
+V2 = TypeVar("V2", covariant=True)
 SelfT = TypeVar("SelfT", bound=frozendict[K, V])
 
 class frozendict(Mapping[K, V]):
@@ -34,9 +34,18 @@ class frozendict(Mapping[K, V]):
     def __copy__(self: SelfT) -> SelfT: ...
     def __deepcopy__(self: SelfT) -> SelfT: ...
     def delete(self: SelfT, key: K) -> SelfT: ...
+    @overload
     def key(self: SelfT, index: int) -> K: ...
+    @overload
+    def key(self: SelfT) -> K: ...
+    @overload
     def value(self: SelfT, index: int) -> V: ...
+    @overload
+    def value(self: SelfT) -> V: ...
+    @overload
     def item(self: SelfT, index: int) -> Tuple[K, V]: ...
+    @overload
+    def item(self: SelfT) -> Tuple[K, V]: ...
     @overload
     def __or__(self: SelfT, other: Mapping[K, V]) -> SelfT: ...
     @overload
@@ -53,6 +62,10 @@ class frozendict(Mapping[K, V]):
     def set(self: SelfT, key: K, value: V2) -> frozendict[K, Union[V, V2]]: ...
     @overload
     def set(self: SelfT, key: K2, value: V2) -> frozendict[Union[K, K2], Union[V, V2]]: ...
+    @overload
+    def setdefault(self: SelfT, key: K) -> SelfT: ...
+    @overload
+    def setdefault(self: SelfT, key: K2) -> SelfT: ...
     @overload
     def setdefault(self: SelfT, key: K, default: V) -> SelfT: ...
     @overload
@@ -71,6 +84,7 @@ class frozendict(Mapping[K, V]):
 
 
 FrozenOrderedDict = frozendict
+c_ext: bool
 
 class FreezeError(Exception):  pass
 

@@ -17,13 +17,13 @@ _empty_frozendict = None
 class frozendict(dict):
     r"""
     A simple immutable dictionary.
-    
-    The API is the same as `dict`, without methods that can change the 
+
+    The API is the same as `dict`, without methods that can change the
     immutability. In addition, it supports __hash__().
     """
     
     __slots__ = (
-        "_hash", 
+        "_hash",
     )
     
     @classmethod
@@ -58,7 +58,7 @@ class frozendict(dict):
             
             if self.__class__ == frozendict and not len(self):
                 global _empty_frozendict
-
+                
                 if _empty_frozendict is None:
                     _empty_frozendict = self
                 else:
@@ -127,7 +127,7 @@ class frozendict(dict):
     
     def __deepcopy__(self, memo, *args, **kwargs):
         r"""
-        As for tuples, if hashable, see copy(); otherwise, it returns a 
+        As for tuples, if hashable, see copy(); otherwise, it returns a
         deepcopy.
         """
         
@@ -142,7 +142,7 @@ class frozendict(dict):
         
         if return_copy:
             return self.copy()
-            
+        
         tmp = deepcopy(dict(self))
         
         return klass(tmp)
@@ -152,7 +152,7 @@ class frozendict(dict):
         Support for `pickle`.
         """
         
-        return (self.__class__, (dict(self), ))
+        return (self.__class__, (dict(self),))
     
     def set(self, key, val):
         new_self = deepcopy(dict(self))
@@ -178,7 +178,7 @@ class frozendict(dict):
             return self.__class__(new_self)
         
         return self.__class__()
-        
+    
     def _get_by_index(self, collection, index):
         try:
             return collection[index]
@@ -234,8 +234,8 @@ except AttributeError:
     def frozendict_reversed(self, *args, **kwargs):
         return reversed(tuple(self))
     
-    frozendict.__reversed__ = frozendict_reversed
     
+    frozendict.__reversed__ = frozendict_reversed
 
 frozendict.clear = immutable
 frozendict.pop = immutable
@@ -245,4 +245,4 @@ frozendict.__delattr__ = immutable
 frozendict.__setattr__ = immutable
 frozendict.__module__ = 'frozendict'
 
-__all__ = (frozendict.__name__, )
+__all__ = (frozendict.__name__,)

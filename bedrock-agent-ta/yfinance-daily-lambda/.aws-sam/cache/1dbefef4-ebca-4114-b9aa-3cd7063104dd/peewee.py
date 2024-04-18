@@ -58,6 +58,10 @@ try:
     pg_register_uuid()
 except Exception:
     pass
+try:
+    from psycopg import errors as pg3_errors
+except ImportError:
+    pg3_errors = None
 
 mysql_passwd = False
 try:
@@ -70,7 +74,7 @@ except ImportError:
         mysql = None
 
 
-__version__ = '3.17.1'
+__version__ = '3.17.3'
 __all__ = [
     'AnyField',
     'AsIs',
@@ -1574,11 +1578,14 @@ class Expression(ColumnBase):
             op_in = self.op == OP.IN or self.op == OP.NOT_IN
             if op_in and ctx.as_new().parse(self.rhs)[0] == '()':
                 return ctx.literal('0 = 1' if self.op == OP.IN else '1 = 1')
+            rhs = self.rhs
+            if rhs is None and (self.op == OP.IS or self.op == OP.IS_NOT):
+                rhs = SQL('NULL')
 
             return (ctx
                     .sql(self.lhs)
                     .literal(' %s ' % op_sql)
-                    .sql(self.rhs))
+                    .sql(rhs))
 
 
 class StringExpression(Expression):
@@ -2088,7 +2095,7 @@ class BaseQuery(Node):
         return iter(self.execute(database).iterator())
 
     def _ensure_execution(self):
-        if not self._cursor_wrapper:
+        if self._cursor_wrapper is None:
             if not self._database:
                 raise ValueError('Query has not been executed.')
             self.execute()
@@ -3049,9 +3056,13 @@ class ExceptionWrapper(object):
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             return
-        # psycopg2.8 shits out a million cute error types. Try to catch em all.
+        # psycopg shits out a million cute error types. Try to catch em all.
         if pg_errors is not None and exc_type.__name__ not in self.exceptions \
            and issubclass(exc_type, pg_errors.Error):
+            exc_type = exc_type.__bases__[0]
+        elif pg3_errors is not None and \
+           exc_type.__name__ not in self.exceptions \
+           and issubclass(exc_type, pg3_errors.Error):
             exc_type = exc_type.__bases__[0]
         if exc_type.__name__ in self.exceptions:
             new_type = self.exceptions[exc_type.__name__]
@@ -3069,7 +3080,9 @@ EXCEPTIONS = {
     'NotSupportedError': NotSupportedError,
     'OperationalError': OperationalError,
     'ProgrammingError': ProgrammingError,
-    'TransactionRollbackError': OperationalError}
+    'TransactionRollbackError': OperationalError,
+    'UndefinedFunction': ProgrammingError,
+    'UniqueViolation': IntegrityError}
 
 __exception_wrapper__ = ExceptionWrapper(EXCEPTIONS)
 

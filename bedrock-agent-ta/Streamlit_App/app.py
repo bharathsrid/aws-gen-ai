@@ -70,13 +70,14 @@ if submit_button and prompt:
         "sessionId": st.session_state['sessionId'],
         "question": prompt
     }
+    print("CALLING LAMBDA HANDLER")
     response = agenthelper.lambda_handler(event, None)
-
+    print("COMPLETED LAMBDA HANDLER")
     try:
         # Parse the JSON string
         if response and 'body' in response and response['body']:
             response_data = json.loads(response['body'])
-            print("TRACE & RESPONSE DATA ->  ", response_data)
+            # print("TRACE & RESPONSE DATA ->  ", response_data)
         else:
             print("Invalid or empty response received")
     except json.JSONDecodeError as e:
@@ -105,7 +106,7 @@ if submit_button and prompt:
 if end_session_button:
     st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!"})
     event = {
-        "sessionId": sessionId,
+        "sessionId": st.session_state['sessionId'],
         "question": "placeholder to end session",
         "endSession": True
     }

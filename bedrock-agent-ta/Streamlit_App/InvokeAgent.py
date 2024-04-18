@@ -1,4 +1,29 @@
-from boto3.session import Sessionfrom botocore.auth import SigV4Authfrom botocore.awsrequest import AWSRequestfrom botocore.credentials import Credentialsimport jsonimport osfrom requests import requestimport base64import ioimport sys#For this to run on a local machine in VScode, you need to set the AWS_PROFILE environment variable to the name of the profile/credentials you want to use.#You also need to input your model ID near the bottom of this file.#check for credentials#echo $AWS_ACCESS_KEY_ID#echo $AWS_SECRET_ACCESS_KEY#echo $AWS_SESSION_TOKEN#os.environ["AWS_PROFILE"] = "agent-demo"theRegion = "us-east-1"os.environ["AWS_REGION"] = theRegionregion = os.environ.get("AWS_REGION")llm_response = ""
+from boto3.session import Session
+from botocore.auth import SigV4Auth
+from botocore.awsrequest import AWSRequest
+from botocore.credentials import Credentials
+import json
+import traceback
+import os
+from requests import request
+import base64
+import io
+import sys
+
+#For this to run on a local machine in VScode, you need to set the AWS_PROFILE environment variable to the name of the profile/credentials you want to use.
+#You also need to input your model ID near the bottom of this file.
+
+#check for credentials
+#echo $AWS_ACCESS_KEY_ID
+#echo $AWS_SECRET_ACCESS_KEY
+#echo $AWS_SESSION_TOKEN
+
+
+#os.environ["AWS_PROFILE"] = "agent-demo"
+theRegion = "us-east-1"
+os.environ["AWS_REGION"] = theRegion
+region = os.environ.get("AWS_REGION")
+llm_response = ""
 
 def sigv4_request(
     url,
@@ -142,7 +167,6 @@ def find_rationale_text(split_response_dict, all_rationale, all_text):
 
 
 def decode_response(response):
-    print("In decode response")
     # Create a StringIO object to capture print statements
     captured_output = io.StringIO()
     print("about to set stdout")
@@ -248,23 +272,42 @@ def decode_response(response):
         # print(f"type of captured response json loads is {type(json.loads(captured_string))}")
     except Exception as e:
         sys.stdout = sys.__stdout__
-        print("Restored stdout in Exception")
+        print("Restored stdout in Exception ***")
+        print(f"error is *** {e}")
+        tb = traceback.extract_tb(e.__traceback__)
+        line_number = tb[-1].lineno
+        print(f"Error occurred on line {line_number}")
+        print(f"Response is *** {response}")
+        print(f"type Response is *** {type(response)}")
         # Print the captured output
-        print(f'captured output is {captured_output.getvalue()}')
+        # print(f'captured output is {captured_output.getvalue()}')
         # Get the string from captured output
-        captured_string = captured_output.getvalue()
-        print(f"captured string is {captured_string}")
-        print(f"error is {e}")
-        print(f"EXCEPTION full rationale is {rationale}")
+        # captured_string = captured_output.getvalue()
+        print("EXCEPTION captured string START ==== ")
+        # print(f"{captured_string}")
+        print("EXCEPTION captured string END ==== ")
+        print(f"EXCEPTION full rationale is *** {all_rationale}")
         raise e
 
 
     # Return both the captured output and the final response
-    print(f"full rationale is {rationale_string}")
+    print("START OF RATIONALE============")
+    print(f"{all_rationale}")
+    print("END OF RATIONALE============")
+
+    print("START OF ALL_TEXT============")
+    print(f"{all_text}")
+    print("END OF ALL_TEXT============")
     # return captured_string, llm_response
     print("START OF FULL TRACE============")
     print(captured_string)
     print("END OF FULL TRACE============")
+
+
+    # return captured_string, llm_response
+    print("START OF LLM RESPONSE============")
+    print(llm_response)
+    print("END OF LLM RESPONSE============")
     return all_rationale, all_text, llm_response
 
 
@@ -291,6 +334,10 @@ def lambda_handler(event, context):
     try:
         # response, trace_data = askQuestion(question, url, endSession)
         all_rationale, all_text, llm_response = askQuestion(question, url, endSession)
+        print("Before JSON DUMPS")
+        print(f"type of llm_response is {type(llm_response)}")
+        print(f"type of all_rationale is {type(all_rationale)}")
+        print(f"type of all_text is {type(all_text)}")
         return {
             "status_code": 200,
             "body": json.dumps({"response": llm_response, "rationale": all_rationale, "text": all_text})
@@ -300,3 +347,4 @@ def lambda_handler(event, context):
             "status_code": 500,
             "body": json.dumps({"error": str(e)})
         }
+

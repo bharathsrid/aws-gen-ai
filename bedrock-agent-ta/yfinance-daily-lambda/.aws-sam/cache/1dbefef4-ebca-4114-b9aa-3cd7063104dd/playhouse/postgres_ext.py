@@ -13,7 +13,6 @@ from peewee import Expression
 from peewee import Node
 from peewee import NodeList
 from peewee import __deprecated__
-from peewee import __exception_wrapper__
 
 try:
     from psycopg2cffi import compat
@@ -300,8 +299,6 @@ class JSONField(Field):
     _json_datatype = 'json'
 
     def __init__(self, dumps=None, *args, **kwargs):
-        if Json is None:
-            raise Exception('Your version of psycopg2 does not support JSON.')
         self.dumps = dumps or json.dumps
         super(JSONField, self).__init__(*args, **kwargs)
 
