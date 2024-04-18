@@ -1,4 +1,0 @@
-requests
-yfinance
-ta
-urllib3<2

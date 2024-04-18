@@ -301,7 +301,7 @@ def decode_response(response):
     # return captured_string, llm_response
     print("START OF FULL TRACE============")
     print(captured_string)
-    print("END OF FULL TRACE============")
+    print("END OF FULL TRACE===========")
 
 
     # return captured_string, llm_response
