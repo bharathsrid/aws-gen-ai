@@ -75,6 +75,7 @@ def askQuestion(question, url, endSession=False):
         "enableTrace": True,
         "endSession": endSession
     }
+    print("++++++++++++++++++IN ASK Q+++++")
 
     # send request
     response = sigv4_request(
@@ -162,6 +163,7 @@ def find_rationale_text(split_response_dict, all_rationale, all_text):
             elif isinstance(value, dict):
                 all_rationale, all_text = find_rationale_text(value, all_rationale, all_text)
     except Exception as e:
+        print("IN FIND RATIONALE TEXT EXCEPTIOPN")
         print(e)
     return all_rationale, all_text
 
@@ -195,7 +197,9 @@ def decode_response(response):
                 for i in range(0, len(close_split)-1):
                     json_string = json_string + close_split[i] + "}"
                 json_string = "{" + json_string
+                print("ABOUT TO JSON LOAD TO DICT")
                 split_response_dict = json.loads(json_string)
+                print("COMPLETED JSON LOAD CALLING FIND RATIONALE")
                 all_rationale, all_text = find_rationale_text(split_response_dict, all_rationale, all_text)
                 print("")
                 print(split_response_dict)

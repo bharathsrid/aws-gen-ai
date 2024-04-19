@@ -77,7 +77,7 @@ if submit_button and prompt:
         # Parse the JSON string
         if response and 'body' in response and response['body']:
             response_data = json.loads(response['body'])
-            # print("TRACE & RESPONSE DATA ->  ", response_data)
+            print("TRACE & RESPONSE DATA ->  ", response_data)
         else:
             print("Invalid or empty response received")
     except json.JSONDecodeError as e:
