@@ -244,4 +244,6 @@ $RECYCLE.BIN/
 /cache
 .aws-sam/
 *cache*
+.idea
+.idea/
 # End of https://www.gitignore.io/api/osx,linux,python,windows,pycharm,visualstudiocode
