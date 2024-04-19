@@ -77,7 +77,7 @@ if submit_button and prompt:
         # Parse the JSON string
         if response and 'body' in response and response['body']:
             response_data = json.loads(response['body'])
-            print("TRACE & RESPONSE DATA ->  ", response_data)
+            # print("TRACE & RESPONSE DATA ->  ", response_data)
         else:
             print("Invalid or empty response received")
     except json.JSONDecodeError as e:
@@ -111,8 +111,9 @@ if end_session_button:
         "endSession": True
     }
     globals()['sessionId'] = "MYSESSION" + str(random.randint(1, 100000))
-    agenthelper.lambda_handler(event, None)
+    
     st.session_state['history'].clear()
+    agenthelper.lambda_handler(event, None)
 
 # Display conversation history
 st.write("## Conversation History")
