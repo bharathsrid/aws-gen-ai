@@ -132,10 +132,13 @@ st.write("## Test Prompts")
 
 # Creating a list of prompts for the Knowledge Base section
 test_prompts = [
-    {"Prompt": "can you give me list of stocks in brtIndex"},
-    {"Prompt": "can you give the top three gainers in terms of percentage in the last 6 months in brtIndex"},
-    {"Prompt": "CAn you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA"},
-    {"Prompt": "Which stocks have closed over both 20 SMA and 50 EMA"}
+    {"Prompt": "can you give me list of stocks in Nasdaq"},
+    {"Prompt": "can you give the top three gainers in terms of percentage in the last 6 months in Nifty"},
+    {"Prompt": "CAn you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA. Use stocks from Nasdaq index"},
+    {"Prompt": "Which stocks have closed over both 20 SMA and 50 EMA in the FTSE index"},
+    {"Prompt": "CAn you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA and 50 day EMA. Use stocks from FTSE index"},
+    {"Prompt": "of these stocks are there any that have grown over 25% in the last months. If so can you give me the stocks and their growth percent over 6 months."}
+
 ]
 
 # Displaying the Knowledge Base prompts as a table
