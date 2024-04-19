@@ -72,7 +72,7 @@ if submit_button and prompt:
     }
     print("CALLING BOTO HANDLER")
     # response = agenthelper.lambda_handler(event, None)
-    response_text, rationale, full_text = InvokeAgentBoto.invoke_agent(input=prompt,sessionId=st.session_state['sessionId'])
+    response_text, rationale, full_text = InvokeAgentBoto.bedrock_invoke_agent(input=prompt,sessionId=st.session_state['sessionId'])
     print("COMPLETED BOTO HANDLER")
     # try:
     #     # Parse the JSON string
@@ -105,16 +105,16 @@ if submit_button and prompt:
     st.session_state['trace_data'] = rationale
 
 if end_session_button:
+    print("ENDING SESSION")
+    print(f"session history is {st.session_state['history']}")
     st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!"})
-    response_text, rationale, full_text = InvokeAgentBoto.invoke_agent(input="Thanks for your interaction. Please close the session",sessionId=st.session_state['sessionId'],endSession=True)
-    event = {
-        "sessionId": st.session_state['sessionId'],
-        "question": "placeholder to end session",
-        "endSession": True
-    }
+    response_text, rationale, full_text = InvokeAgentBoto.bedrock_invoke_agent(input="Thanks for your interaction. Please close the session",sessionId=st.session_state['sessionId'],endSession=True)
+    print("BACKINAPP")
     globals()['sessionId'] = "MYSESSION" + str(random.randint(1, 100000))
-    
+    print(f"NEWSESSION{st.session_state['sessionId']}")
     st.session_state['history'].clear()
+    st.session_state.clear()
+    st.session_state['history'] = []
     # agenthelper.lambda_handler(event, None)
 
 # Display conversation history
