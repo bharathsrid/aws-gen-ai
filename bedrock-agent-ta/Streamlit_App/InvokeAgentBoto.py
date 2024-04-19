@@ -21,7 +21,7 @@ def find_rationale_text(split_response_dict,all_rationale="",all_text=""):
 
 
 def bedrock_invoke_agent(input,sessionId,enableTrace=True,endSession=False):
-    print(f"BEDROCKINVOKED Session id is {sessionId}")
+    print(f"BEDROCK INVOKED Session id is {sessionId}")
     print(f"Input is {input}")
     print(f"endsession is {endSession}")
     client = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
@@ -34,7 +34,7 @@ def bedrock_invoke_agent(input,sessionId,enableTrace=True,endSession=False):
         sessionId=sessionId
 
     )
-    print(response)
+    # print(response)
     response_text = ""
     rationale = ""
     full_text = ""
@@ -46,7 +46,7 @@ def bedrock_invoke_agent(input,sessionId,enableTrace=True,endSession=False):
                 # print("RESPONSE START======")
                 # print(response_text)
             except json.decoder.JSONDecodeError as jsde:
-                # print("Not a valid Json, so directly reading as string")
+                print("Not a valid Json, so directly reading as string")
                 response_text = event['chunk']['bytes'].decode('utf-8')
                 # print(event["chunk"])
 
@@ -63,22 +63,10 @@ def bedrock_invoke_agent(input,sessionId,enableTrace=True,endSession=False):
         else:
             print("NOT CHUNK OR TRACE")
 
-    print("RESPONDING TO CALL WITH RETURN")
+    print("Returning from Bedrock with the following")
     print(f"RESPONSE TEXT IS {response_text}")
     print(f"RATIONALE IS {rationale}")
     print(f"FULL TEXT IS {full_text}")
-    print("FINISED FULL TEXT")
-    print(f"Session id is {sessionId}")
+
     return response_text, rationale, full_text
 
-
-if __name__ == '__main__':
-    input = "can you give me list of stocks"
-    sessionId = "session"+str(random.randint(1, 1000000))
-    sessionId = "session262023"
-    response_text, rationale, full_text = bedrock_invoke_agent(sessionId=sessionId, input=input)
-    # response_text, rationale, full_text = bedrock_invoke_agent(sessionId=sessionId, input="Thanks for your interaction. Please close the session", endSession=True)
-    print(f"SESSION ID IS {sessionId}")
-    print(f"RESPONSE TEXT IS {response_text}")
-    print(f"Rationale is {rationale}")
-    print(f"Full Text is {full_text}")
