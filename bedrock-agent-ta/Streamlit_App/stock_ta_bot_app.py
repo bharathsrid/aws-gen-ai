@@ -127,19 +127,32 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
             # Generate a unique key for each answer text area
             st.text_area("A:", value=chat["answer"], height=100, key=f"answer_{index}")
 
-# Example Prompts Section
-st.write("## Test Prompts")
+
 
 # Creating a list of prompts for the Knowledge Base section
-test_prompts = [
-    {"Prompt": "can you give me list of stocks in Nasdaq"},
-    {"Prompt": "can you give the top three gainers in terms of percentage in the last 6 months in Nifty"},
-    {"Prompt": "CAn you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA. Use stocks from Nasdaq index"},
-    {"Prompt": "Which stocks have closed over both 20 SMA and 50 EMA in the FTSE index"},
-    {"Prompt": "CAn you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA and 50 day EMA. Use stocks from FTSE index"},
-    {"Prompt": "of these stocks are there any that have grown over 25% in the last months. If so can you give me the stocks and their growth percent over 6 months."}
+test_prompts = """
+    1. Can you give me list of stocks in Nasdaq
+    2. Can you give the top three gainers in terms of percentage in the last 6 months in Nifty
+    3. Can you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA. Use stocks from Nasdaq index
+    4. Which stocks have closed over both 20 SMA and 50 EMA in the FTSE index
+    5. Can you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA and 50 day EMA. Use stocks from FTSE index
+    6. of these stocks are there any that have grown over 25% in the last months. If so can you give me the stocks and their growth percent over 6 months
 
-]
+"""
+
+
+st.write("## About the Tool")
+about = ""
+about = about + "This chatbot uses Amazon Bedrock agents and orchestrates various steps using multiple lambda based tools at its disposal, to get you the answer.\n\n"
+about = about + "**The tools at its disposal are**"
+about = about + "\n"
+about = about + "1. Tool to get stocks in an index. It has data for FTSE, Nasdaq and FTSE indeices\n"
+about = about + "2. For a given list of stocks the change percentage over a number of days up to 1 year\n"
+about = about + "3. For a given list of stocks get the technical indicators over a number of days. Currently it supports Simple Moving Average (SMA) and Exponenital Moving Average (EMA)\n"
+
+st.markdown(about)
 
 # Displaying the Knowledge Base prompts as a table
-st.table(test_prompts)
+# Example Prompts Section
+st.write("## Test Prompts")
+st.text(test_prompts)
