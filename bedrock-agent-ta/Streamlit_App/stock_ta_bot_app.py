@@ -130,15 +130,20 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
 
 
 # Creating a list of prompts for the Knowledge Base section
-test_prompts = """
-    1. Can you give me list of stocks in Nasdaq
-    2. Can you give the top three gainers in terms of percentage in the last 6 months in Nifty
-    3. Can you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA. Use stocks from Nasdaq index
-    4. Which stocks have closed over both 20 SMA and 50 EMA in the FTSE index
-    5. Can you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA and 50 day EMA. Use stocks from FTSE index
-    6. of these stocks are there any that have grown over 25% in the last months. If so can you give me the stocks and their growth percent over 6 months
+test_prompts = [
+    "Can you give me list of stocks in Nasdaq",
+    "Can you give the top three gainers in terms of percentage in the last 6 months in Nifty",
+    "Can you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA. Use stocks from Nasdaq index",
+    "Which stocks have closed over both 20 SMA and 50 EMA in the FTSE index",
+    "Can you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA and 50 day EMA. Use stocks from FTSE index",
+    "of these stocks are there any that have grown over 25% in the last months. If so can you give me the stocks and their growth percent over 6 months"
 
-"""
+]
+
+test_prompts_string = ""
+# iterate over test prompt and add the number starting with index in the list + 1
+for index, prompt in enumerate(test_prompts):
+    test_prompts_string = test_prompts_string + str(index + 1) + ". " + prompt + "\n"
 
 
 st.write("## About the Tool")
@@ -155,4 +160,4 @@ st.markdown(about)
 # Displaying the Knowledge Base prompts as a table
 # Example Prompts Section
 st.write("## Test Prompts")
-st.text(test_prompts)
+st.text(test_prompts_string)
