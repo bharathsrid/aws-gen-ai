@@ -99,7 +99,7 @@ st.write("## Conversation History")
 
 # Load images outside the loop to optimize performance
 human_image = Image.open('images/human_face.png')
-robot_image = Image.open('images/robot_face.jpg')
+robot_image = Image.open('images/robot_face_1.png')
 circular_human_image = crop_to_circle(human_image)
 circular_robot_image = crop_to_circle(robot_image)
 
@@ -112,7 +112,7 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
         # Generate a unique key for each question text area
         st.text_area("Q:", value=chat["question"], height=50, key=f"question_{index}", disabled=True)
 
-    # Creating columns for Answer
+    # Creating columns for Answers
     col1_a, col2_a = st.columns([2, 10])
     if isinstance(chat["answer"], pd.DataFrame):
         with col1_a:
