@@ -28,6 +28,8 @@ Resources:
             Principal: 
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy
       Policies:
         - PolicyName: S3Access
           PolicyDocument: 
@@ -43,9 +45,10 @@ Resources:
                   - logs:PutLogEvents
                 Resource: arn:aws:logs:*:*:*
               - Effect: Allow
-                Action:
-                  - cloudwatch:PutMetricData
-                Resource: '*'
+                Action: 
+                  - "cloudwatch:PutMetricData"
+                Resource: "*"
+
 
   StockChangeAPIFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -53,6 +56,11 @@ Resources:
       CodeUri: get-stock-change-lambda/
       Handler: app.lambda_handler
       Runtime: python3.10
+      Layers:
+        - arn:aws:lambda:us-east-1:580247275435:layer:LambdaInsightsExtension:1
+      Environment:
+        Variables:
+          LAMBDA_INSIGHTS_LOG_LEVEL: info
       Architectures:
       - x86_64
       Role: !GetAtt StockChangeAPIFunctionRole.Arn
