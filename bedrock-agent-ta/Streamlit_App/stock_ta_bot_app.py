@@ -86,6 +86,7 @@ if submit_button and prompt:
 if end_session_button:
     print("ENDING SESSION")
     if 'history' in st.session_state:
+        print("INENDING")
         st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!"})
         st.session_state['history'].clear()
     response_text, rationale, full_text = InvokeAgentBoto.bedrock_invoke_agent(input="Thanks for your interaction. Please close the session",sessionId=st.session_state['sessionId'],endSession=True)
