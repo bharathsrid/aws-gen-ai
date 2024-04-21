@@ -89,9 +89,8 @@ if end_session_button:
         print("INENDING")
         st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!"})
         st.session_state['history'].clear()
-    if 'sessionId' not in st.session_state:
-        st.session_state['sessionId'] = ""
-    response_text, rationale, full_text = InvokeAgentBoto.bedrock_invoke_agent(input="Thanks for your interaction. Please close the session",sessionId=st.session_state['sessionId'],endSession=True)
+    if 'sessionId' in st.session_state:
+        response_text, rationale, full_text = InvokeAgentBoto.bedrock_invoke_agent(input="Thanks for your interaction. Please close the session",sessionId=st.session_state['sessionId'],endSession=True)
     globals()['sessionId'] = "MYSESSION" + str(random.randint(1, 100000))
     print(f"NEW SESSION Id is {st.session_state['sessionId']}")
     
