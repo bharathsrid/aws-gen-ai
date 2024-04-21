@@ -8,10 +8,10 @@ def find_rationale_text(split_response_dict,all_rationale="",all_text=""):
             if key == "rationale":
                 if isinstance(value, dict):
                     all_rationale = all_rationale + value['text'] + "\n"
-                else:
-                    all_rationale = all_rationale + value + "\n"
+                elif value.strip():
+                    all_rationale = "Rationale : " + all_rationale + value + "\n"
             elif key == "text":
-                all_text = all_text + value + "\n"
+                all_text = "Text : " + all_text + value + "\n"
             elif isinstance(value, dict):
                 all_rationale, all_text = find_rationale_text(value, all_rationale, all_text)
     except Exception as e:
