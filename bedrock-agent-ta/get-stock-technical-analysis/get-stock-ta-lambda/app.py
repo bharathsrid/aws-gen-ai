@@ -3,6 +3,7 @@ import pandas as pd
 import boto3
 from ta.utils import dropna
 from ta.trend import SMAIndicator, EMAIndicator
+from ta.momentum import RSIIndicator
 
 # import requests
 
@@ -96,8 +97,19 @@ def lambda_handler(event, context):
                 tmp_ta_dict["Close"] = stock_close
                 tmp_ta_dict["TI"] = stock_ta
                 stock_ta_list.append(tmp_ta_dict)
+            elif tech_indicator == "RSI":
+                indicator_ta = RSIIndicator(stock_df["Close"], window=no_of_days)
+                stock_df["TI"] = indicator_ta.rsi()
+                print(stock_df.tail(5))
+                print(stock_df['Close'])
+                print(type(stock_df['Close']))
+                stock_close = stock_df['Close'].iloc[-1]
+                stock_ta = stock_df['TI'].iloc[-1]
+                tmp_ta_dict["Close"] = stock_close
+                tmp_ta_dict["TI"] = stock_ta
+                stock_ta_list.append(tmp_ta_dict)
             else:
-                body = list({"{} is not a valid technical analysis we support, try another one.".format(tech_indicator)})
+                body = list({"{} is not a valid technical analysis we support. we support EMA, SMA and RSI. Can you try one of these.".format(tech_indicator)})
 
 
         # convert the dictionary into json string

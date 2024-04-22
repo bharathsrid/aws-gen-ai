@@ -43,7 +43,7 @@
                         "required": true,
                         "schema": {
                             "type": "String",
-                            "enum": ["SMA", "EMA"]
+                            "enum": ["SMA", "EMA", "RSI"]
                         }
 
                     }],
