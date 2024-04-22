@@ -161,7 +161,7 @@ about = ""
 about = about + "This chatbot uses Amazon Bedrock agents and orchestrates various steps using multiple lambda based tools at its disposal, to get you the answer.\n\n"
 about = about + "**The tools at its disposal are**"
 about = about + "\n"
-about = about + "1. Tool to get stocks in an index. It has data for FTSE, Nasdaq and FTSE indeices\n"
+about = about + "1. Tool to get stocks in an index. It has data for FTSE, Nasdaq and Nifty indices\n"
 about = about + "2. For a given list of stocks the change percentage over a number of days up to 1 year\n"
 about = about + "3. For a given list of stocks get the technical indicators over a number of days. Currently it supports Simple Moving Average (SMA),  Exponenital Moving Average (EMA) and Relative Strength Index (RSI)\n"
 
