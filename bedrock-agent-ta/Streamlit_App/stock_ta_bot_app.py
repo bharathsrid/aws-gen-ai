@@ -141,7 +141,7 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
 test_prompts = [
     "Can you give me list of stocks in Nasdaq",
     "how much did Amzn grow over the last 2 months",
-    "can you compare AMD and NVDA in terms of percentage growth over 1 month, 3 months and 6 months."
+    "can you compare AMD and NVDA in terms of percentage growth over 1 month, 3 months and 6 months.",
     "Can you give the top three gainers in terms of percentage in the last 6 months in Nifty",
     "Can you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA. Use stocks from Nasdaq index",
     "Which stocks have closed over both 20 SMA and 50 EMA in the FTSE index",
