@@ -26,7 +26,7 @@ def bedrock_invoke_agent(input,sessionId,enableTrace=True,endSession=False):
     print(f"endsession is {endSession}")
     client = boto3.client('bedrock-agent-runtime', region_name='us-east-1')
     response = client.invoke_agent(
-        agentAliasId='TB7TCZJSPH',
+        agentAliasId='QOFTKHRFU6',
         agentId='8KCZPQNWJ6',
         enableTrace=True,
         endSession=False,
