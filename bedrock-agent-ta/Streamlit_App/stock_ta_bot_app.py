@@ -99,19 +99,6 @@ if end_session_button:
     print(f"NEW SESSION Id is {st.session_state['sessionId']}")
     # agenthelper.lambda_handler(event, None)
 
-# Below working block
-
-# if end_session_button:
-#     print("ENDING SESSION")
-#     st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!"})
-#     response_text, rationale, full_text = InvokeAgentBoto.bedrock_invoke_agent(input="Thanks for your interaction. Please close the session",sessionId=st.session_state['sessionId'],endSession=True)
-#     globals()['sessionId'] = "MYSESSION" + str(random.randint(1, 100000))
-#     print(f"NEW SESSION Id is {st.session_state['sessionId']}")
-#     st.session_state['history'].clear()
-#     st.session_state.clear()
-#     st.session_state['history'] = []
-#     # agenthelper.lambda_handler(event, None)
-
 
 
 
@@ -153,6 +140,8 @@ for index, chat in enumerate(reversed(st.session_state['history'])):
 # Creating a list of prompts for the Knowledge Base section
 test_prompts = [
     "Can you give me list of stocks in Nasdaq",
+    "how much did Amzn grow over the last 2 months",
+    "can you compare AMD and NVDA in terms of percentage growth over 1 month, 3 months and 6 months."
     "Can you give the top three gainers in terms of percentage in the last 6 months in Nifty",
     "Can you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA. Use stocks from Nasdaq index",
     "Which stocks have closed over both 20 SMA and 50 EMA in the FTSE index",
