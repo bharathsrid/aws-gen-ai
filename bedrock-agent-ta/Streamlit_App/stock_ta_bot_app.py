@@ -89,14 +89,31 @@ if end_session_button:
         print("INENDING")
         st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!"})
         st.session_state['history'].clear()
+    globals()['sessionId'] = "MYSESSION" + str(random.randint(1, 100000))
     if 'sessionId' in st.session_state:
         response_text, rationale, full_text = InvokeAgentBoto.bedrock_invoke_agent(input="Thanks for your interaction. Please close the session",sessionId=st.session_state['sessionId'],endSession=True)
-    globals()['sessionId'] = "MYSESSION" + str(random.randint(1, 100000))
-    print(f"NEW SESSION Id is {st.session_state['sessionId']}")
-    
+
     st.session_state.clear()
     st.session_state['history'] = []
+    st.session_state['sessionId'] = sessionId
+    print(f"NEW SESSION Id is {st.session_state['sessionId']}")
     # agenthelper.lambda_handler(event, None)
+
+# Below working block
+
+# if end_session_button:
+#     print("ENDING SESSION")
+#     st.session_state['history'].append({"question": "Session Ended", "answer": "Thank you for using AnyCompany Support Agent!"})
+#     response_text, rationale, full_text = InvokeAgentBoto.bedrock_invoke_agent(input="Thanks for your interaction. Please close the session",sessionId=st.session_state['sessionId'],endSession=True)
+#     globals()['sessionId'] = "MYSESSION" + str(random.randint(1, 100000))
+#     print(f"NEW SESSION Id is {st.session_state['sessionId']}")
+#     st.session_state['history'].clear()
+#     st.session_state.clear()
+#     st.session_state['history'] = []
+#     # agenthelper.lambda_handler(event, None)
+
+
+
 
 # Display conversation history
 st.write("## Conversation History")
