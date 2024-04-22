@@ -111,9 +111,8 @@ def lambda_handler(event, context):
             else:
                 body = list({"{} is not a valid technical analysis we support. we support EMA, SMA and RSI. Can you try one of these.".format(tech_indicator)})
 
-
-        # convert the dictionary into json string
-        body = stock_ta_list
+        if len(stock_ta_list) > 0:
+            body = stock_ta_list
 
 
     else:
