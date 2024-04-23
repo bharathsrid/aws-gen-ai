@@ -9,7 +9,7 @@ import random
 # sessionId = "MYSESSION" + str(random.randint(1, 100000))
 
 # Streamlit page configuration
-st.set_page_config(page_title="Stock Technical Anlysis Bot", page_icon=":robot_face:", layout="wide")
+st.set_page_config(page_title="Stocky Rocky", page_icon=":robot_face:", layout="wide")
 
 # Function to crop image into a circle
 def crop_to_circle(image):
@@ -21,7 +21,7 @@ def crop_to_circle(image):
     return result
 
 # Title
-st.title("Stock Technical Anlysis Bot")
+st.title("Stocky Rocky")
 
 
 
