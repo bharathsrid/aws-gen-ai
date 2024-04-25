@@ -42,6 +42,8 @@ def lambda_handler(event, context):
 
 
     stock_list_input = params['stockList']
+    print(f"stock lis is {stock_list_input}")
+    print(f"type of stock list is {type(stock_list_input)}")
     cleaned_stock_list_input_string = stock_list_input.replace('[','').replace(']','').replace('"','') 
     stock_list = cleaned_stock_list_input_string.split(", ")
     
