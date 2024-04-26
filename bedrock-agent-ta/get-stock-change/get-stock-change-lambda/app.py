@@ -45,11 +45,12 @@ def lambda_handler(event, context):
     print(f"stock lis is {stock_list_input}")
     print(f"type of stock list is {type(stock_list_input)}")
     cleaned_stock_list_input_string = stock_list_input.replace('[','').replace(']','').replace('"','').replace(', ',',')
+    cleaned_stock_list_input_string = cleaned_stock_list_input_string.replace("<value>", "").replace("</value>", "")
     stock_list = cleaned_stock_list_input_string.split(",")
     
     print(stock_list)
     print(type(stock_list))
-    no_of_days = int(params['noOfDays'])
+    no_of_days = int(params['noOfDays'].replace("<value>", "").replace("</value>", ""))
 
     # download csv file from a s3 bucket into /tmp
     s3 = boto3.resource('s3')
