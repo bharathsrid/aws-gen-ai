@@ -143,7 +143,7 @@ test_prompts = [
     "how much did Amzn grow over the last 2 months",
     "can you compare AMD and NVDA in terms of percentage growth over 1 month, 3 months and 6 months.",
     "Can you give the top three gainers in terms of percentage in the last 6 months in Nifty",
-    "Can you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA. Use stocks from Nasdaq index",
+    "Can you give list of stocks that has both grown over 10% in last 6 months and also closed above their 20 day SMA. Use stocks from Nasdaq index",
     "Which stocks have closed over both 20 SMA and 50 EMA in the FTSE index",
     "Can you give list of stocks that has grown over 10% in last 6 months and closed above 20 day SMA and 50 day EMA. Use stocks from FTSE index",
     "of these stocks are there any that have grown over 25% in the last months. If so can you give me the stocks and their growth percent over 6 months"
