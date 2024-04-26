@@ -37,7 +37,8 @@ def lambda_handler(event, context):
     responses = []
     api_path = event['apiPath']
     params = dict((param['name'], param['value']) for param in event['parameters'])
-    index_name = params['indexName'] 
+    index_name = params['indexName']
+    index_name = index_name.replace("<value>", "").replace("</value>", "")
     print(index_name)
     if api_path=="/get-index":
         if index_name == 'brtIndex':
