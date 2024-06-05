@@ -42,9 +42,17 @@ ParameterKey=S3Bucket,ParameterValue=${ARTIFACT_BUCKET_NAME} \
 --region ${aws_region}
 
 # sleep 5
-aws cloudformation describe-stacks --stack-name $stack_name --region ${aws_region} --query "Stacks[0].StackStatus" --profile child
-aws cloudformation wait stack-create-complete --stack-name $stack_name --region ${aws_region} --profile child
-aws cloudformation describe-stacks --stack-name $stack_name --region ${aws_region} --query "Stacks[0].StackStatus" --profile child
+aws cloudformation describe-stacks --stack-name ${stack_name} --region ${aws_region} --query "Stacks[0].StackStatus" --profile child
+aws cloudformation wait stack-create-complete --stack-name ${stack_name} --region ${aws_region} --profile child
+aws cloudformation describe-stacks --stack-name ${stack_name} --region ${aws_region} --query "Stacks[0].StackStatus" --profile child
+
+# Get the output of the CloudFormation stack
+LAMBDA_FUNCTION_NAME=$(aws cloudformation describe-stacks --stack-name ${stack_name} --query 'Stacks[0].Outputs[?OutputKey==`YfinDailyFunction`].OutputValue' --output text --profile child --region ${aws_region})
+
+
+echo "Asynchronously Invoking function $LAMBDA_FUNCTION_NAME"
+
+aws lambda invoke --function-name ${LAMBDA_FUNCTION_NAME} --payload '{"key1":"value1","key2":"value2"}' --invocation-type Event --profile child --region ${aws_region} response.json
 
 echo "Successfully created stack $stack_name"
 echo "Successfully created bucket $ARTIFACT_BUCKET_NAME"

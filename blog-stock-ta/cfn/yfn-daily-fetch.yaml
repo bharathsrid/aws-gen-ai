@@ -88,6 +88,7 @@ Resources:
       Principal: events.amazonaws.com
       SourceArn: !GetAtt YfinDailyFunctionScheduleRule.Arn
 
+
   GetIndexFunction:
     Type: AWS::Lambda::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -175,8 +176,6 @@ Resources:
 Outputs:
   YfinDailyFunction:
     Description: Yahoo Finance daily fetch stock details Lambda Function ARN
-    Value: !GetAtt YfinDailyFunction.Arn
+    Value: !Ref YfinDailyFunction
 
-  YfinDailyFunctionIamRole:
-    Description: Implicit IAM Role created for Yahoo Finance daily function
-    Value: !GetAtt IamRoleLambdaExecution.Arn
+
