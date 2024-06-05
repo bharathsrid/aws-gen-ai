@@ -50,7 +50,7 @@ Resources:
     Metadata:
       SamResourceId: IamRoleLambdaExecution
 
-  HelloWorldFunction:
+  YfinDailyFunction:
     Type: AWS::Lambda::Function
     Properties:
       Code:
@@ -69,24 +69,24 @@ Resources:
       Role: !GetAtt IamRoleLambdaExecution.Arn
 
 
-  HelloWorldFunctionScheduleRule:
+  YfinDailyFunctionScheduleRule:
     Type: AWS::Events::Rule
     Properties:
       Description: "Run Lambda function every day"
       ScheduleExpression: "cron(0 0 * * ? *)"  # Run at 00:00 UTC every day
       State: ENABLED
       Targets:
-        - Arn: !GetAtt HelloWorldFunction.Arn
+        - Arn: !GetAtt YfinDailyFunction.Arn
           Id: TargetFunctionV1
 
-  HelloWorldFunctionPermission:
+  YfinDailyFunctionPermission:
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName:
-        Ref: HelloWorldFunction
+        Ref: YfinDailyFunction
       Action: lambda:InvokeFunction
       Principal: events.amazonaws.com
-      SourceArn: !GetAtt HelloWorldFunctionScheduleRule.Arn
+      SourceArn: !GetAtt YfinDailyFunctionScheduleRule.Arn
 
 
   ApplicationResourceGroup:
@@ -105,10 +105,10 @@ Resources:
       AutoConfigurationEnabled: 'true'
 
 Outputs:
-  HelloWorldFunction:
-    Description: Hello World Lambda Function ARN
-    Value: !GetAtt HelloWorldFunction.Arn
+  YfinDailyFunction:
+    Description: Yahoo Finance daily fetch stock details Lambda Function ARN
+    Value: !GetAtt YfinDailyFunction.Arn
 
-  HelloWorldFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
+  YfinDailyFunctionIamRole:
+    Description: Implicit IAM Role created for Yahoo Finance daily function
     Value: !GetAtt IamRoleLambdaExecution.Arn
