@@ -1,0 +1,11 @@
+aws --profile child s3 rb s3://blogstack-3-ta-agent-resources-11623
+aws --profile child s3 rb s3://blogstack-3-ta-agent-resources-19148
+aws --profile child s3 rb s3://blogstack-4-ta-agent-resources-8451
+aws --profile child s3 rb s3://blogstack-5-ta-agent-resources-12939
+aws --profile child s3 rb s3://blogstack-6-ta-agent-resources-10613
+aws --profile child s3 rb s3://blogstack-6-ta-agent-resources-11184
+aws --profile child s3 rb s3://blogstack-6-ta-agent-resources-209
+aws --profile child s3 rb s3://blogstack-6-ta-agent-resources-25665
+aws --profile child s3 rb s3://blogstack-6-ta-agent-resources-3256
+aws --profile child s3 rb s3://blogstack-6-ta-agent-resources-3677
+aws --profile child s3 rb s3://blogstack-6-ta-agent-resources-6049

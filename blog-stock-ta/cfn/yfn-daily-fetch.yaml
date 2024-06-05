@@ -1,20 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
-Description: 'yfinance-daily-lambda
+Description: '
 
-  Sample SAM Template for yfinance-daily-lambda
+  AWS Cloudformation template to create multiple lambdas that act as agents for bedrock.
+
 
   '
 
-Globals:
-  Function:
-    Timeout: 900
-    MemorySize: 512
-    Tracing: Active
-    LoggingConfig:
-      LogFormat: JSON
-  Api:
-    TracingEnabled: true
 
 Parameters:
   S3Bucket:
@@ -58,38 +49,36 @@ Resources:
             Resource: '*'
     Metadata:
       SamResourceId: IamRoleLambdaExecution
+
   HelloWorldFunction:
-    Type: AWS::Serverless::Function
+    Type: AWS::Lambda::Function
     Properties:
-      CodeUri: !Sub "s3://${S3Bucket}/lambda/yfinance-daily-lambda.zip"
+      Code:
+        S3Bucket: !Ref S3Bucket
+        S3Key: lambda/yfinance-daily-lambda.zip
       Handler: app.lambda_handler
       Runtime: python3.10
-      Layers:
-      - arn:aws:lambda:us-east-1:580247275435:layer:LambdaInsightsExtension:1
+      Timeout: 900
+      MemorySize: 512
+      LoggingConfig:
+        LogFormat: JSON
       Environment:
         Variables:
           LAMBDA_INSIGHTS_LOG_LEVEL: info
-          S3_BUCKET : !Ref S3Bucket
-      Architectures:
-      - x86_64
-      Role:
-        Fn::GetAtt:
-        - IamRoleLambdaExecution
-        - Arn
-    Metadata:
-      SamResourceId: HelloWorldFunction
+          S3_BUCKET: !Ref S3Bucket
+      Role: !GetAtt IamRoleLambdaExecution.Arn
+
+
   HelloWorldFunctionScheduleRule:
     Type: AWS::Events::Rule
     Properties:
-      ScheduleExpression: cron(0 0 * * ? *)
+      Description: "Run Lambda function every day"
+      ScheduleExpression: "cron(0 0 * * ? *)"  # Run at 00:00 UTC every day
+      State: ENABLED
       Targets:
-      - Arn:
-          Fn::GetAtt:
-          - HelloWorldFunction
-          - Arn
-        Id: HelloWorldFunctionTarget
-    Metadata:
-      SamResourceId: HelloWorldFunctionScheduleRule
+        - Arn: !GetAtt HelloWorldFunction.Arn
+          Id: TargetFunctionV1
+
   HelloWorldFunctionPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -97,12 +86,9 @@ Resources:
         Ref: HelloWorldFunction
       Action: lambda:InvokeFunction
       Principal: events.amazonaws.com
-      SourceArn:
-        Fn::GetAtt:
-        - HelloWorldFunctionScheduleRule
-        - Arn
-    Metadata:
-      SamResourceId: HelloWorldFunctionPermission
+      SourceArn: !GetAtt HelloWorldFunctionScheduleRule.Arn
+
+
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
     Properties:
@@ -110,26 +96,19 @@ Resources:
         Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
       ResourceQuery:
         Type: CLOUDFORMATION_STACK_1_0
-    Metadata:
-      SamResourceId: ApplicationResourceGroup
+
   ApplicationInsightsMonitoring:
     Type: AWS::ApplicationInsights::Application
     Properties:
       ResourceGroupName:
         Ref: ApplicationResourceGroup
       AutoConfigurationEnabled: 'true'
-    Metadata:
-      SamResourceId: ApplicationInsightsMonitoring
+
 Outputs:
   HelloWorldFunction:
     Description: Hello World Lambda Function ARN
-    Value:
-      Fn::GetAtt:
-      - HelloWorldFunction
-      - Arn
+    Value: !GetAtt HelloWorldFunction.Arn
+
   HelloWorldFunctionIamRole:
     Description: Implicit IAM Role created for Hello World function
-    Value:
-      Fn::GetAtt:
-      - IamRoleLambdaExecution
-      - Arn
+    Value: !GetAtt IamRoleLambdaExecution.Arn
