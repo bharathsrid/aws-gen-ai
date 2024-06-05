@@ -6,10 +6,6 @@ Description: >
   Sample SAM Template for yfinance-daily-lambda
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
-Parameters:
-  S3-BUCKET-NAME:
-    Type: String
-    Description: A parameter to be used as an environment variable
 
 Globals:
   Function:
@@ -70,7 +66,6 @@ Resources:
       Environment:
         Variables:
           LAMBDA_INSIGHTS_LOG_LEVEL: info
-          S3_BUCKET : !Ref S3_BUCKET
       Architectures:
       - x86_64
       Role: !GetAtt IamRoleLambdaExecution.Arn

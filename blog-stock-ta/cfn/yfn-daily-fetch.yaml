@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'yfinance-daily-lambda
+
+  Sample SAM Template for yfinance-daily-lambda
+
+  '
+
+Globals:
+  Function:
+    Timeout: 900
+    MemorySize: 512
+    Tracing: Active
+    LoggingConfig:
+      LogFormat: JSON
+  Api:
+    TracingEnabled: true
+
+Parameters:
+  S3Bucket:
+    Type: String
+    Description: "the name of the S3 bucket where the lambda code and stock data is stored that was creted in the script"
+
+Resources:
+  IamRoleLambdaExecution:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy
+      Policies:
+      - PolicyName: LambdaS3Access
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - s3:*
+            Resource:
+            - !Sub "arn:aws:s3:::${S3Bucket}"
+            - !Sub "arn:aws:s3:::${S3Bucket}/*"
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: arn:aws:logs:*:*:*
+          - Effect: Allow
+            Action:
+            - cloudwatch:PutMetricData
+            Resource: '*'
+    Metadata:
+      SamResourceId: IamRoleLambdaExecution
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: !Sub "s3://${S3Bucket}/lambda/yfinance-daily-lambda.zip"
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Layers:
+      - arn:aws:lambda:us-east-1:580247275435:layer:LambdaInsightsExtension:1
+      Environment:
+        Variables:
+          LAMBDA_INSIGHTS_LOG_LEVEL: info
+          S3_BUCKET : !Ref S3Bucket
+      Architectures:
+      - x86_64
+      Role:
+        Fn::GetAtt:
+        - IamRoleLambdaExecution
+        - Arn
+    Metadata:
+      SamResourceId: HelloWorldFunction
+  HelloWorldFunctionScheduleRule:
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: cron(0 0 * * ? *)
+      Targets:
+      - Arn:
+          Fn::GetAtt:
+          - HelloWorldFunction
+          - Arn
+        Id: HelloWorldFunctionTarget
+    Metadata:
+      SamResourceId: HelloWorldFunctionScheduleRule
+  HelloWorldFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Ref: HelloWorldFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+        - HelloWorldFunctionScheduleRule
+        - Arn
+    Metadata:
+      SamResourceId: HelloWorldFunctionPermission
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+    Metadata:
+      SamResourceId: ApplicationResourceGroup
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName:
+        Ref: ApplicationResourceGroup
+      AutoConfigurationEnabled: 'true'
+    Metadata:
+      SamResourceId: ApplicationInsightsMonitoring
+Outputs:
+  HelloWorldFunction:
+    Description: Hello World Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - HelloWorldFunction
+      - Arn
+  HelloWorldFunctionIamRole:
+    Description: Implicit IAM Role created for Hello World function
+    Value:
+      Fn::GetAtt:
+      - IamRoleLambdaExecution
+      - Arn
