@@ -5,6 +5,7 @@ from ta.utils import dropna
 from ta.trend import SMAIndicator
 import boto3
 from botocore.exceptions import ClientError
+import os
 
 
 # import requests
@@ -44,8 +45,9 @@ def lambda_handler(event, context):
     # WRITE THE DATAFRAME TO A CSV FILE IN s3
     # reset index
     # stock_hist_all.reset_index(inplace=True)
-    stock_hist_all.to_csv('/tmp/stock_data_1y.csv',index=False) 
-    bucket = 'bharsrid-bedrock-agent-yf-demo'
+    stock_hist_all.to_csv('/tmp/stock_data_1y.csv',index=False)
+    bucket = os.getenv('S3_BUCKET') 
+
     key = 'stock_hist/stock_data_1y.csv'
     s3 = boto3.client('s3')
 

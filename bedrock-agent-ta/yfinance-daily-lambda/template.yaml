@@ -6,6 +6,11 @@ Description: >
   Sample SAM Template for yfinance-daily-lambda
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Parameters:
+  S3-BUCKET-NAME:
+    Type: String
+    Description: A parameter to be used as an environment variable
+
 Globals:
   Function:
     Timeout: 900
@@ -65,9 +70,28 @@ Resources:
       Environment:
         Variables:
           LAMBDA_INSIGHTS_LOG_LEVEL: info
+          S3_BUCKET : !Ref S3_BUCKET
       Architectures:
       - x86_64
       Role: !GetAtt IamRoleLambdaExecution.Arn
+
+    # Add the CloudWatch trigger
+  HelloWorldFunctionScheduleRule:
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: 'cron(0 0 * * ? *)'
+      Targets:
+        - Arn: !GetAtt HelloWorldFunction.Arn
+          Id: HelloWorldFunctionTarget
+    # Grant the necessary permissions to the Lambda function
+  HelloWorldFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref HelloWorldFunction
+      Action: 'lambda:InvokeFunction'
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt HelloWorldFunctionScheduleRule.Arn
+
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
