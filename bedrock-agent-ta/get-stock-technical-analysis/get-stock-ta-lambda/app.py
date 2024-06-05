@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 import boto3
+import os
 from ta.utils import dropna
 from ta.trend import SMAIndicator, EMAIndicator
 from ta.momentum import RSIIndicator
@@ -57,7 +58,8 @@ def lambda_handler(event, context):
 
     # download csv file from a s3 bucket into /tmp
     s3 = boto3.resource('s3')
-    s3.Bucket('bharsrid-bedrock-agent-yf-demo').download_file('stock_hist/stock_data_1y.csv', '/tmp/stock_data_1y.csv')
+    bucket = os.getenv('S3_BUCKET') 
+    s3.Bucket(bucket).download_file('stock_hist/stock_data_1y.csv', '/tmp/stock_data_1y.csv')
     stock_1y_df = pd.read_csv('/tmp/stock_data_1y.csv')
     # convert the Date column in dataframe from string to datetime date
     stock_1y_df['Date'] = pd.to_datetime(stock_1y_df['Date'])

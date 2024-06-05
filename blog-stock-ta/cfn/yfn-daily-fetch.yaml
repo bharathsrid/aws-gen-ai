@@ -88,21 +88,89 @@ Resources:
       Principal: events.amazonaws.com
       SourceArn: !GetAtt YfinDailyFunctionScheduleRule.Arn
 
-
-  ApplicationResourceGroup:
-    Type: AWS::ResourceGroups::Group
+  GetIndexFunction:
+    Type: AWS::Lambda::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      Name:
-        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
-      ResourceQuery:
-        Type: CLOUDFORMATION_STACK_1_0
+      Code:
+        S3Bucket: !Ref S3Bucket
+        S3Key: lambda/get-index-lambda.zip
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Timeout: 120
+      MemorySize: 512
+      LoggingConfig:
+        LogFormat: JSON
+      Environment:
+        Variables:
+          LAMBDA_INSIGHTS_LOG_LEVEL: info
+          S3_BUCKET: !Ref S3Bucket
+      Role: !GetAtt IamRoleLambdaExecution.Arn
 
-  ApplicationInsightsMonitoring:
-    Type: AWS::ApplicationInsights::Application
+
+  GetStockChangeFunction:
+    Type: AWS::Lambda::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      ResourceGroupName:
-        Ref: ApplicationResourceGroup
-      AutoConfigurationEnabled: 'true'
+      Code:
+        S3Bucket: !Ref S3Bucket
+        S3Key: lambda/get-stock-change-lambda.zip
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Timeout: 300
+      MemorySize: 512
+      LoggingConfig:
+        LogFormat: JSON
+      Environment:
+        Variables:
+          LAMBDA_INSIGHTS_LOG_LEVEL: info
+          S3_BUCKET: !Ref S3Bucket
+      Role: !GetAtt IamRoleLambdaExecution.Arn
+
+  GetStockTechAnalysisFunction:
+    Type: AWS::Lambda::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      Code:
+        S3Bucket: !Ref S3Bucket
+        S3Key: lambda/get-stock-tech-analysis-lambda.zip
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Timeout: 900
+      MemorySize: 1024
+      LoggingConfig:
+        LogFormat: JSON
+      Environment:
+        Variables:
+          LAMBDA_INSIGHTS_LOG_LEVEL: info
+          S3_BUCKET: !Ref S3Bucket
+      Role: !GetAtt IamRoleLambdaExecution.Arn
+
+
+
+
+  BedrockInvokeGetIndex:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: !Ref GetIndexFunction
+      Action: lambda:InvokeFunction
+      Principal: bedrock.amazonaws.com
+      SourceArn: !Sub "arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:agent/*"
+
+  BedrockInvokeGetStockChange:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: !Ref GetStockChangeFunction
+      Action: lambda:InvokeFunction
+      Principal: bedrock.amazonaws.com
+      SourceArn: !Sub "arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:agent/*"
+
+  BedrockInvokeGetStockTechAnalysis:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: !Ref GetStockTechAnalysisFunction
+      Action: lambda:InvokeFunction
+      Principal: bedrock.amazonaws.com
+      SourceArn: !Sub "arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:agent/*"
+
+
 
 Outputs:
   YfinDailyFunction:
